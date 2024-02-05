@@ -1,7 +1,0 @@
-Gas: 10   ═   Block: 19103103   ═   ETH: $2287
-➕ Buy Tokens | Tutorial (https://learn.unibot.app/product-guides/buy-tokens) | [✪Watchlist (http://t.me/unibotsniper_bot?start=a104_wlOpenVw)] ➕
-
-═⛽️ Gas Settings | [Info (http://t.me/unibotsniper_bot?start=a178_gsInfoVw)]  ═
-[○ Eco (http://t.me/unibotsniper_bot?start=abuy_settings_gsEcoVw)] [● Smart® (http://t.me/unibotsniper_bot?start=abuy_settings_gsSmrtVw)] [○ Aggr (http://t.me/unibotsniper_bot?start=abuy_settings_gsAggrVw)] | [Tip: --  GWEI (http://t.me/unibotsniper_bot?start=abuy_settings_gsTipVw)]
-• 🔬 Aggregation: For all swaps, we compare quotes from aggregators and simulate results to maximize your trades.
-• 🌟 Easy Mode automatically use the safest and optimal settings for your swaps, ensuring that you receive the best price possible.
