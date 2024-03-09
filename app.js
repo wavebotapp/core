@@ -25,7 +25,6 @@ app.all("*", (req, res) => {
     res.send("URL not found")
 })
 
-console.log("Hello WaveBot")
 app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
 })
