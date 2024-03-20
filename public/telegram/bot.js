@@ -335,14 +335,9 @@ async function telegram() {
       bot.sendMessage(chatId, 'Choose an option:', { reply_markup: JSON.stringify(buyKeyboard) });
     } else if (msg.text === 'sell') {
       bot.sendMessage(chatId, `Gas: 29   ═   Block: 19181025   ═   ETH: $2428
-      ➖  Sell Tokens | Tutorial (https://learn.unibot.app/product-guides/sell-tokens) | [✪Watchlist (http://t.me/unibotsniper_bot?start=a220_wlOpenVw)]  ➖
-      Set your sell settings in the menu below and then enter the lines numbers of the tokens you wish to sell. Selling using high slippage can result in being frontrun or sandwiched. Use private transactions to avoid sandwich attacks.
-         •Sell Amount: the % of your bag you wish to sell
-         •Slippage: Definition (https://help.coinbase.com/en/coinbase/trading-and-funding/advanced-trade/slippage)
-      
-      ═⛽️ Gas Settings | [Info (http://t.me/unibotsniper_bot?start=a913_gsInfoVw)]  ═
-      [○ Eco (http://t.me/unibotsniper_bot?start=asell_settings_gsEcoVw)] [● Smart® (http://t.me/unibotsniper_bot?start=asell_settings_gsSmrtVw)] [○ Aggr (http://t.me/unibotsniper_bot?start=asell_settings_gsAggrVw)] | [Tip: --  GWEI (http://t.me/unibotsniper_bot?start=asell_settings_gsTipVw)]
-      
+      ➖  Sell Tokens | Tutorial   ➖
+      Set your sell settings in the menu below and then enter the lines numbers of the tokens you wish to sell. Selling using high slippage can result in being frontrun or sandwiched. Use private transactions to avoid sandwich attacks.•Sell Amount: the % of your bag you wish to sell
+      •Slippage: Definition 
       • 🔬 Aggregation: For all swaps, we compare quotes from aggregators and simulate results to maximize your trades.
       • 🌟 Easy Mode automatically use the safest and optimal settings for your swaps, ensuring that you receive the best price possible..` , { reply_markup: JSON.stringify(sellKeyboard) });
     } else if (msg.text === 'watchlist') {

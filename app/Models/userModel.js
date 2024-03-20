@@ -29,10 +29,6 @@ const userSchema = new mongoose.Schema({
         type: Array,
         required: true
     },
-    // coinlist: {
-    //     type: Array,
-    //     required: true
-    // },
     status: {
         type: String,
         default: "activate"
