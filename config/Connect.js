@@ -5,6 +5,6 @@ mongoose.connect(process.env.MONGODB, {
     useUnifiedTopology:true,
 })
     .then(() => { console.log("DB Connect Successfully") })
-    .catch(() => { console.log("DB Not Connected") })
+    .catch((err) => { console.log("DB Not Connected",err) })
 
 module.exports = mongoose
