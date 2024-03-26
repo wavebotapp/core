@@ -1,6 +1,7 @@
 const express = require('express')
 const route = express.Router()
 const userController = require('../Controllers/userController')
+const coinController = require('../Controllers/coinBuySell')
 const { authuser } = require("../middlewares/authuser")
 const passport = require('passport')
 //================================= User Controllers ================================
@@ -16,7 +17,12 @@ route.post('/addWallet', authuser, userController.addWallet);
 route.get('/recentUsers', authuser, userController.recentUsers);
 route.get('/allWatchlistData', authuser, userController.allWatchList);
 route.post('/removeCoinWatchlist', authuser, userController.removeCoinWatchlist);
-//route.post('/buy', authuser, userController.buyCoin);
 
+
+
+route.post('/balance', authuser  ,coinController.addbalance);
+route.post('/buyCoin', authuser ,  coinController.buy);
+route.post('/sellCoin', authuser ,  coinController.sell);
+route.get('/viewbalance', authuser ,  coinController.viewBalance);
 
 module.exports = route

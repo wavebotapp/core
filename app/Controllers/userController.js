@@ -2,7 +2,6 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const axios = require('axios');
 const userModel = require('../Models/userModel')
-const purchaseModel = require('../Models/purchase')
 const { ObjectId } = require('mongodb')
 var randomstring = require("randomstring");
 const HTTP = require('../../constants/responseCode.constant')
@@ -317,9 +316,15 @@ const removeCoinWatchlist = async (req, res) => {
     }
 };
 
-
-
-
+const buyCoin = async (req, res) => {
+    try {
+        const user = await userModel.findOne({ name : req.body.name });
+        return res.status(HTTP.SUCCESS).send({ "status": true, 'code': HTTP.SUCCESS, "msg": "User Profile", data: user });
+    }catch(error){
+        console.log("🚀 ~ removeCoinWatchlist ~ error:", error);
+        return res.status(HTTP.INTERNAL_SERVER_ERROR).send({ 'status': false, 'code': HTTP.INTERNAL_SERVER_ERROR, 'msg': 'Something went wrong!', data: {} });
+    }
+}
 
 
 
@@ -336,5 +341,5 @@ module.exports = {
     removeCoinWatchlist,
     addWallet,
     recentUsers,
-    //buyCoin,
+    buyCoin,
 } 

@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema({
         type: Array,
         required: true
     },
+    balance: {
+        type: Number,
+        default : 0
+    },
     status: {
         type: String,
         default: "activate"
