@@ -3,7 +3,7 @@ const express = require('express')
 const app = express();
 const passport = require('passport')
 const bodyParser = require('body-parser');
-const { telegram } = require("./public/telegram/bot")
+//const { telegram } = require("./public/telegram/bot")
 const PORT = process.env.PORT || 3333
 const cors = require('cors');
 
@@ -17,7 +17,7 @@ require('./config/Connect')
 require("./config/passport")
 app.use(passport.initialize());
 app.use(express.json());
-telegram()
+//telegram()
 app.use(express.static("emailtemplets"))
 app.use('/', require('./app/routers/userRouter'));
 
