@@ -15,7 +15,7 @@ var transporter = nodemailer.createTransport({
     }
 });
 
-const sendMail = async (data) => {
+const sendMail =  (data) => {
     const templetpath = 'otp.html'
     // fs.readFile(templetpath, { encoding: 'utf-8' }, function (err, html) {
 
@@ -28,9 +28,9 @@ const sendMail = async (data) => {
         subject: 'Email OTP Verification',
         html: `<p>Please verify your OTP : <h1>${data.otp}</h1></p>`
     };
-    await transporter.sendMail(mailOptions, function (error, info) {
+     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
-            console.log(error.message);
+            console.log(error);
             return ({ error: error })
         } else {
             console.log('Email sent successfully');
