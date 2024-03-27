@@ -35,7 +35,7 @@ const signUp = async (req, res) => {
                 otp: random_Number,
                 templetpath: "./emailtemplets/otp_template.html"
             }
-            await sendMail(data)
+            sendMail(data)
             console.log("line39")
             let saveData = await obj.save()
             console.log("🚀 ~ signUp ~ saveData:", saveData)
@@ -60,7 +60,7 @@ const login = async (req, res) => {
         if (!email.includes("@")) return res.status(HTTP.SUCCESS).send({ "status": false, 'code': HTTP.BAD_REQUEST, "msg": "Email is invalid !", data: {} })
         const findUser = await userModel.findOne({ email: email })
         if (!findUser) {
-            return res.status(HTTP.SUCCESS).send({ "status": false, 'code': HTTP.UNAUTHORIZED, "msg": "Email Is Not Existing"})
+            return res.status(HTTP.SUCCESS).send({ "status": false, 'code': HTTP.UNAUTHORIZED, "msg": "Email Is Not Existing" })
         }
         if (findUser.verify == false) {
             return res.status(HTTP.SUCCESS).send({ "status": false, 'code': HTTP.UNAUTHORIZED, "msg": "You Are Not Verified" })
@@ -322,9 +322,9 @@ const removeCoinWatchlist = async (req, res) => {
 
 const buyCoin = async (req, res) => {
     try {
-        const user = await userModel.findOne({ name : req.body.name });
+        const user = await userModel.findOne({ name: req.body.name });
         return res.status(HTTP.SUCCESS).send({ "status": true, 'code': HTTP.SUCCESS, "msg": "User Profile", data: user });
-    }catch(error){
+    } catch (error) {
         console.log("🚀 ~ removeCoinWatchlist ~ error:", error);
         return res.status(HTTP.INTERNAL_SERVER_ERROR).send({ 'status': false, 'code': HTTP.INTERNAL_SERVER_ERROR, 'msg': 'Something went wrong!', data: {} });
     }
