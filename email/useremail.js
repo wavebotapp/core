@@ -31,6 +31,7 @@ const sendMail = (data) => {
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 console.log(error.message);
+                return ({ error: error})
             } else {
                 console.log('Email sent successfully');
             }
