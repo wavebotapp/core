@@ -17,6 +17,9 @@ route.post('/addWallet', authuser, userController.addWallet);
 route.get('/recentUsers', authuser, userController.recentUsers);
 route.get('/allWatchlistData', authuser, userController.allWatchList);
 route.post('/removeCoinWatchlist', authuser, userController.removeCoinWatchlist);
+route.get('/profile',(req,res)=>{
+    return res.status(200).send({ 'status': true, 'code': 200, 'msg': 'Profile Show successfully.' });
+});
 
 
 
