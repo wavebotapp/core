@@ -3,6 +3,9 @@ const path = require("path")
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const handlebars = require('handlebars');
+const HTTP = require("../constants/responseCode.constant")
+
+
 
 var transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -32,11 +35,13 @@ const sendMail = (data) => {
             };
             transporter.sendMail(mailOptions, function (error, info) {
                 if (error) {
-                    console.log(error);
-                    return ({ error: error })
-                } else {
-                    console.log('Email sent successfully');
-                }
+                    console.log("error" + error)
+                    return ({ status: false, data: [], message: 'Could not send mail!',error });
+                } 
+                console.log("info " + info)
+                console.log('Message sent: %s', info.messageId);
+                console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                return ({ status: true, data: [], message: 'mail sent!.' });
             });
 
         })
