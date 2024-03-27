@@ -16,7 +16,7 @@ var transporter = nodemailer.createTransport({
 });
 
 const sendMail = (data) => {
-    const templetpath = 'otp_template.html'
+    const templetpath = 'otp.html'
     fs.readFile(templetpath, { encoding: 'utf-8' }, function (err, html) {
 
         var template = handlebars.compile(html);
