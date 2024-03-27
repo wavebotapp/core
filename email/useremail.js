@@ -15,30 +15,39 @@ var transporter = nodemailer.createTransport({
     }
 });
 
-const sendMail =  (data) => {
-    const templetpath = 'otp.html'
-    // fs.readFile(templetpath, { encoding: 'utf-8' }, function (err, html) {
+const sendMail = (data) => {
+    try {
+        return new Promise(async resolve => {
+            const templetpath = 'otp.html'
+            // fs.readFile(templetpath, { encoding: 'utf-8' }, function (err, html) {
 
-    // var template = handlebars.compile(html);
-    // var htmlToSend = template({ username: data.name, email: data.email, otp: data.otp });
+            // var template = handlebars.compile(html);
+            // var htmlToSend = template({ username: data.name, email: data.email, otp: data.otp });
 
-    var mailOptions = {
-        from: 'test.project7312@gmail.com',
-        to: data.email,
-        subject: 'Email OTP Verification',
-        html: `<p>Please verify your OTP : <h1>${data.otp}</h1></p>`
-    };
-     transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-            console.log(error);
-            return ({ error: error })
-        } else {
-            console.log('Email sent successfully');
-        }
-    });
-    // })
+            var mailOptions = {
+                from: 'test.project7312@gmail.com',
+                to: data.email,
+                subject: 'Email OTP Verification',
+                html: `<p>Please verify your OTP : <h1>${data.otp}</h1></p>`
+            };
+            transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                    console.log(error);
+                    return ({ error: error })
+                } else {
+                    console.log('Email sent successfully');
+                }
+            });
+
+        })
+
+        // })
+    } catch (e) {
+        console.log(e)
+        return res.status(HTTP.SUCCESS).send({ "status": false, 'code': HTTP.INTERNAL_SERVER_ERROR, "message": "Unable to send email!", data: {} })
+    }
+
 }
-
 
 module.exports = {
     sendMail,
