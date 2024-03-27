@@ -13,6 +13,7 @@ const signUp = async (req, res) => {
     console.log("=============================== Sign Up =============================", req.body);
     try {
         const { name, email, password, confirmPassword } = req.body
+        console.log(req.body)
         if (!name || !email || !password || !confirmPassword) return res.status(HTTP.SUCCESS).send({ status: false, "code": HTTP.NOT_ALLOWED, msg: "All Fields Are Required" })
         if (!email.includes("@")) return res.status(HTTP.SUCCESS).send({ "status": false, 'code': HTTP.BAD_REQUEST, "msg": "Email is invalid !", data: {} })
         const random_Number = randomstring.generate({ length: 4, charset: 'numeric' })
@@ -36,6 +37,7 @@ const signUp = async (req, res) => {
             }
             sendMail(data)
             let saveData = await obj.save()
+            console.log("🚀 ~ signUp ~ saveData:", saveData)
             //delete saveData._doc.otp
             return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, msg: "Register Successfully", data: saveData })
         }
@@ -43,6 +45,7 @@ const signUp = async (req, res) => {
             return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, msg: "Password doesn't match!" })
         }
     } catch (error) {
+        console.log(error.msg)
         return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.INTERNAL_SERVER_ERROR, msg: "Something Went Wrong", error: error.msg })
     }
 }
