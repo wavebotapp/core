@@ -35,10 +35,10 @@ const signUp = async (req, res) => {
                 otp: random_Number,
                 templetpath: "./emailtemplets/otp_template.html"
             }
-            sendMail(data)
             console.log("line39")
             let saveData = await obj.save()
             console.log("🚀 ~ signUp ~ saveData:", saveData)
+            sendMail(data)
             //delete saveData._doc.otp
             return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, msg: "Register Successfully", data: saveData })
         }
