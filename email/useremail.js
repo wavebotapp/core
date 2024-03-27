@@ -6,7 +6,7 @@ const handlebars = require('handlebars');
 
 var transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
-    port: 465,
+    port: 587,
     secure: true,
     service: 'gmail',
     auth: {
@@ -15,7 +15,7 @@ var transporter = nodemailer.createTransport({
     }
 });
 
-const sendMail = (data) => {
+const sendMail = async (data) => {
     const templetpath = 'otp.html'
     // fs.readFile(templetpath, { encoding: 'utf-8' }, function (err, html) {
 
@@ -28,7 +28,7 @@ const sendMail = (data) => {
         subject: 'Email OTP Verification',
         html: `<p>Please verify your OTP : <h1>${data.otp}</h1></p>`
     };
-    transporter.sendMail(mailOptions, function (error, info) {
+    await transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
             console.log(error.message);
             return ({ error: error })
