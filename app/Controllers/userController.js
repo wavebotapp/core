@@ -38,32 +38,7 @@ const signUp = async (req, res) => {
             console.log("line39")
             let saveData = await obj.save()
             console.log("🚀 ~ signUp ~ saveData:", saveData)
-            // sendMail(data)
-            const nodemailer = require('nodemailer');
-            var transporter = nodemailer.createTransport({
-                host: "smtp.gmail.com",
-                port: 587,
-                secure: true,
-                service: 'gmail',
-                auth: {
-                    user: 'test.project7312@gmail.com',
-                    pass: 'whwo afoz xzuc trkh'
-                }
-            });
-            var mailOptions = {
-                from: 'test.project7312@gmail.com',
-                to: data.email,
-                subject: 'Email OTP Verification',
-                html: `<p>Please verify your OTP : <h1>${data.otp}</h1></p>`
-            };
-            transporter.sendMail(mailOptions, function (error, info) {
-                if (error) {
-                    console.log(error);
-                    return ({ error: error })
-                } else {
-                    console.log('Email sent successfully');
-                }
-            });
+            sendMail(data)
             //delete saveData._doc.otp
             return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, msg: "Register Successfully", data: saveData })
         }

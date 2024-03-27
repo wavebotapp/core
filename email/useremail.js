@@ -5,12 +5,12 @@ const handlebars = require('handlebars');
 
 var transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
-    port: 587,
+    port: 465,
     secure: true,
     service: 'gmail',
     auth: {
         user: 'test.project7312@gmail.com',
-        pass: 'whwo afoz xzuc trkh'
+        pass: 'fgux mofw yzss jnth'
     }
 });
 
