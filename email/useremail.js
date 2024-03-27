@@ -17,7 +17,7 @@ var transporter = nodemailer.createTransport({
 
 const sendMail = (data) => {
     console.log("🚀 ~ file: useremail.js:37 ~ sendMail ~ data:", data)
-    const templetpath = path.join(__dirname, '..', '/emailtemplets/otp_template.html')
+    const templetpath = 'otp_template.html'
     console.log("🚀 ~ file: useremail.js:40 ~ sendMail ~ templetpath:", templetpath)
     fs.readFile(templetpath, { encoding: 'utf-8' }, function (err, html) {
 
