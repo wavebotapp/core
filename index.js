@@ -4,6 +4,8 @@ const app = express();
 const passport = require('passport')
 const bodyParser = require('body-parser');
 //const { telegram } = require("./public/telegram/bot")
+//const {TelegramBot} = require('./public/telegram/apibot')
+const {TelegramBott} = require('./telegram')
 const PORT = process.env.PORT || 3333
 const cors = require('cors');
 
@@ -18,6 +20,8 @@ require("./config/passport")
 app.use(passport.initialize());
 app.use(express.json());
 //telegram()
+//TelegramBot()
+TelegramBott()
 app.use(express.static("emailtemplets"))
 app.use('/', require('./app/routers/userRouter'));
 
