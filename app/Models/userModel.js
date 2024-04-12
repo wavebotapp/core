@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const mongooseFieldEncryption = require("mongoose-field-encryption").fieldEncryption;
+
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -31,14 +33,35 @@ const userSchema = new mongoose.Schema({
     },
     balance: {
         type: Number,
-        default : 0
+        default: 0
     },
-    status: {
+    wallet: {
         type: String,
-        default: "activate"
+        required: false
     },
+    hashedPrivateKey: {
+        type: String,
+        required: false
+    },
+    chatId: {
+        type: Number,
+        required: true,
+        // default : "123",
+        unique: true
+      },
+    // status: {
+    //     type: String,
+    //     default: "activate"
+    // },
 }, { timestamps: true })
 
+userSchema.plugin(mongooseFieldEncryption, { 
+    fields: ["hashedPrivateKey"], 
+    secret: "code",
+    saltGenerator: function (secret) {
+      return "1234567890123456"; 
+    },
+  });
 const userModel = mongoose.model('user', userSchema);
 
 module.exports = userModel

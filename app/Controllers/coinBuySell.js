@@ -83,7 +83,7 @@ const buy = async (req, res) => {
 const sell = async (req, res) => {
     try {
         const { quantity, id } = req.body;
-        console.log("🚀 ~ sell ~ req.body:", req.body);
+        console.log("🚀 ~ sell ~ req.body:0", req.body);
         const coinInfo = await getCoinPrice(id);
         const totalSaleAmount = quantity * coinInfo.current_price;
         console.log("Total Sale Amount:", totalSaleAmount);

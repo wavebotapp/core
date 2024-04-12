@@ -1,55 +1,52 @@
-
 async function telegram() {
-
+  const controller = require("../../app/Controllers/userController")
+  const UserModel = require('../../app/Models/userModel')
   const TelegramBot = require('node-telegram-bot-api');
-  const TOKEN = "7007643106:AAGzE_xdclVp07EfzJ6nl_OgTtP8EE9QWDc";
-  console.log("🚀 ~ TOKEN:", TOKEN)
+  require('dotenv').config();
+  const axios = require('axios');
+
+  const TOKEN = process.env.TELEGRAM_TOKEN;
+  const API_URL = 'http://localhost:3332'; // Replace with your actual API endpoint
+  const WEBSITE_URL = 'https://marketing-dashboard-beta.vercel.app/';
   const bot = new TelegramBot(TOKEN, { polling: true });
-  
-  const menuKeyboard = {
-    inline_keyboard: [
-      [
-        { text: 'Buy Tokens', callback_data: 'buyTokensButton' },
-        { text: 'Sell Tokens', callback_data: 'sellTokensButton' },
-      ],
-      [
-        { text: 'Buy Limit', callback_data: 'buyLimitButton' },
-        { text: 'Sell Limit', callback_data: 'sellLimitButton' },
-      ],
-      [
-        { text: 'Snipers(ERC-20)', callback_data: 'snipersButton' },
-      ],
-      [
-        { text: 'Token Balances', callback_data: 'tokenBalancesButton' },
-        { text: 'Wallet Analysis', callback_data: 'walletAnaiysisButton' },
-        { text: '🌐 Flex PnL', callback_data: 'FlexButton' },
-      ],
-      [
-        { text: '💻 WaveBot', callback_data: 'waveBotButton' },
-        { text: 'Bridge ⟠Eth', callback_data: 'bridgeButton' },
-        { text: '⚙️Settings', callback_data: 'settingButton' },
-      ],
-    ],
-  };
-  
-  
+
   const buyKeyboard = {
     inline_keyboard: [
       [
+        { text: 'Buy', callback_data: 'buyButton' },
+        { text: 'Sell', callback_data: 'sellButton' },
+      ],
+      [
+        { text: 'Position', callback_data: 'positionButton' },
+        { text: 'Limit Orders', callback_data: 'limitOrdersButton' },
+        { text: 'DCA Orders', callback_data: 'DCAOrdersButton' },
+      ],
+      [
+        { text: 'Swap Token', callback_data: 'SwaptokenButton' },
+      ],
+      [
+        { text: 'Bridge', callback_data: 'bridgeButton' },
+        { text: 'Referrals', callback_data: 'referralsButton' },
+        { text: 'Withdraw', callback_data: 'withdrawButton' },
+      ],
+      [
+        { text: '✅ Ethereum', callback_data: 'ethereumButton' },
+        { text: 'Arbitrum', callback_data: 'arbitrumButton' },
+        { text: 'Basechain', callback_data: 'basechainButton' },
+      ],
+      [
+        { text: '⚙️Settings', callback_data: 'settingButton' },
+        { text: '🗘Refresh', callback_data: 'refreshButton' },
+        { text: '💼Balance', callback_data: 'balanceButton' },
+      ],
+    ],
+  };
+
+  const sellKeyboard = {
+    inline_keyboard: [
+      [
         { text: '↰ Menu', callback_data: 'menuButton' },
-        { text: '✖ Close', callback_data: 'closeButton' },
-      ],
-      [
-        { text: '✅ Easy Mode', callback_data: 'easyModeButton' },
-        { text: 'Expert Mode', callback_data: 'expertModeButton' },
-      ],
-      [
-        { text: '🔴 PrivateTX', callback_data: 'privateTXButton' },
-        { text: '🟢 Failgurd', callback_data: 'failgurdButton' },
-        { text: '🔴 Frontrun', callback_data: 'frontrunButton' },
-      ],
-      [
-        { text: '≡  SELECT WALLETS ≡ ', callback_data: 'selectWalletsButton' },
+        { text: '🗘Refresh', callback_data: 'refreshButton' },
       ],
       [
         { text: 'w1', callback_data: 'w1Button' },
@@ -57,71 +54,36 @@ async function telegram() {
         { text: 'w3', callback_data: 'w3Button' },
       ],
       [
-        { text: '≡ BUY WITH  ≡', callback_data: 'buyWithButton' },
-      ],
-      [
-        { text: '✅⇌ 0.1 ETH', callback_data: 'ethAmountButton' },
-        { text: '✏️ 0.1 ETH', callback_data: 'ethValueButton' },
-      ],
-      [
-        { text: '≡ SLIPPAGE ≡', callback_data: 'slippageButton' },
-      ],
-      [
-        { text: '✅ Auto', callback_data: 'autoSlippageButton' },
-        { text: '⇌ 3%', callback_data: 'slippage3Button' },
-        { text: '✏️ 10%', callback_data: 'slippage10Button' },
-      ],
-      [
-        { text: '≡ RECEIVE TOKEN ≡', callback_data: 'receiveTokenButton' },
-      ],
-      [
-        { text: 'USDC', callback_data: 'usdcButton' },
-        { text: '✅✏️0xf8..c3C9', callback_data: 'tokenAddressButton' },
-      ],
-      [
-        { text: ' SEND TX', callback_data: 'sendTXButton' },
+        { text: 'Custom ✏️', callback_data: 'customButton' },
       ],
     ],
   };
-  
-  
-  const sellKeyboard = {
+
+  const UserdataKeyboard = {
     inline_keyboard: [
       [
         { text: '↰ Menu', callback_data: 'menuButton' },
         { text: '✖ Close', callback_data: 'closeButton' },
       ],
       [
-        { text: '✅ Easy Mode', callback_data: 'easyModeButton' },
-        { text: 'Expert Mode', callback_data: 'expertModeButton' },
-      ],
-      [
-        { text: '≡  SELL AMOUNT ≡ ', callback_data: 'selectWalletsButton' },
-      ],
-      [
-        { text: '10%', callback_data: '10%Button' },
-        { text: '15%', callback_data: '20%Button' },
-        { text: '25%', callback_data: '30%Button' },
-      ],
-      [
-        { text: '50%', callback_data: '50%Button' },
-        { text: '75%', callback_data: '75%Button' },
-        { text: '✅100%', callback_data: '100%Button' },
-      ],
-      [
-        { text: '≡ RECEIVE TOKEN ≡', callback_data: 'buyWithButton' },
-      ],
-      [
-        { text: 'USDC', callback_data: 'usdcButton' },
-        { text: '✅ETH', callback_data: 'tokenAddressButton' },
-      ],
-      [
-        { text: '📝Select Tokens To Sell📝', callback_data: 'sendTXButton' },
+        { text: 'SignUp', callback_data: 'w1Button' },
+        { text: 'Login', callback_data: 'w2Button' },
       ],
     ],
   };
-  
-  
+
+  const WithdrawKeyboard = {
+    inline_keyboard: [
+      [
+        { text: '↰ Menu', callback_data: 'menuButton' },
+      ],
+      [
+        { text: 'Transfer ⟠ETH', callback_data: 'transferButton' },
+        { text: 'Transfer Toekn', callback_data: 'transferTokenButton' },
+      ],
+    ],
+  };
+
   const settingKeyboard = {
     inline_keyboard: [
       [
@@ -129,322 +91,448 @@ async function telegram() {
         { text: '✖ Close', callback_data: 'closeButton' },
       ],
       [
-        { text: 'Replace Wallet', callback_data: 'replaceWalletButton' },
-        { text: 'Import Wallet', callback_data: 'importWalletButton' },
         { text: 'Private Keys', callback_data: 'privateKeysButton' },
-      ],
-      [
-        { text: 'Transfer ⟠Eth ', callback_data: 'transferButton' },
-        { text: 'Transfer Token', callback_data: 'transferTokenButton' },
-        { text: 'Bridge ⟠Eth', callback_data: 'frontrunButton' },
-      ],
-      [
-        { text: 'Remove/Change Password', callback_data: 'changePassButton' },
-      ],
-      [
-        { text: 'Link Wallet', callback_data: 'linkWalletButton' },
-        { text: 'Set Referral Code', callback_data: 'referralButton' },
-      ],
-      [
-        { text: '🔴 Hide Tooltips', callback_data: 'ethAmountButton' },
-        { text: '🔴 Mute Value Monitor', callback_data: 'ethValueButton' },
-      ],
-      [
-        { text: 'English ✅ ', callback_data: 'usdcButton' },
-        { text: 'Chinese x', callback_data: 'tokenAddressButton' },
-      ],
-    ],
-  };
-  
-  
-  const walletAnalysisKeyboard = {
-    inline_keyboard: [
-      [
-        { text: '↰ Menu', callback_data: 'menuButton' },
-        { text: '🌐 Flex PnL', callback_data: 'FlexButton' },
-        { text: '✖ Close', callback_data: 'closeButton' },
-      ],
-      [
-        { text: 'w1', callback_data: 'w1Button' },
-        { text: 'w2', callback_data: 'w2Button' },
-        { text: 'w3', callback_data: 'w3Button' },
-      ],
-    ],
-  };
-  
-  
-  const sniperMenuKeyboard = {
-    inline_keyboard: [
-      [
-        { text: '↰ Menu', callback_data: 'menuButton' },
-        { text: '✖ Close', callback_data: 'closeButton' },
-      ],
-      [
-        { text: 'Token Sniper Menu', callback_data: 'tokenSniperMenuButton' },
-      ],
-      [
-        { text: 'Auto Sniper Menu', callback_data: 'autoSniperMenuButton' },
-      ],
-      [
-        { text: 'CopytradeSniperMenu', callback_data: 'copySniperMenuButton' },
-      ],
-    ],
-  };
-  
-  
-  const totalbalanceKeyboard = {
-    inline_keyboard: [
-      [
-        { text: '↰ Menu', callback_data: 'menuButton' },
-        { text: '↻ Refresh', callback_data: 'snipermenuButton' },
-        { text: '✖ Close', callback_data: 'closeButton' },
-      ],
-  
-    ],
-  };
-  
-  
-  const autosniperMenuKeyboard = {
-    inline_keyboard: [
-      [
-        { text: '↰ Menu', callback_data: 'menuButton' },
-        { text: '↰ Sniper Menu', callback_data: 'snipermenuButton' },
-        { text: '✖ Close', callback_data: 'closeButton' },
-      ],
-      [
-        { text: '≡ SNIPER ON/OFF ≡ ', callback_data: 'sniperonofButton' },
-      ],
-      [
-        { text: 'w1:🔴', callback_data: 'w1Button' },
-        { text: 'w2:🔴', callback_data: 'w2Button' },
-        { text: 'w3:🟢', callback_data: 'w3Button' },
-      ],
-      [
-        { text: '≡ SNIPER SETUP ≡ ', callback_data: 'sniperSetupButton' },
-      ],
-      [
-        { text: 'Max Spend Amt:✏️⟠0.08: ', callback_data: 'maxAmtButton' },
-      ],
-      [
-        { text: '❌ Autosell:✏️OFF', callback_data: 'autoSellButton' },
-      ],
-      [
-        { text: '❌ Anti-Rug', callback_data: 'anti-rugButton' },
-      ],
-      [
-        { text: '🎯 Trigger:✏️≥ Sniper🎯', callback_data: 'triggerButton' },
-      ],
-    ],
-  };
-  
-  
-  const buyLimitKeyboard = {
-    inline_keyboard: [
-      [
-        { text: '↰ Menu', callback_data: 'menuButton' },
-        { text: '✖ Close', callback_data: 'closeButton' },
-      ],
-      [
-        { text: 'Token: --', callback_data: 'tokenButton' },
-      ],
-      [
-        { text: 'Amt: 1.0 ETH', callback_data: 'amtButton' },
-        { text: 'Expire: 72h', callback_data: 'expireButton' },
-      ],
-      [
-        { text: '🗑️ Delete Order', callback_data: 'deleteorderButton' },
-      ],
-      [
-        { text: '≡  SELECT WALLETS ≡ ', callback_data: 'selectWalletsButton' },
-      ],
-      [
-        { text: 'w1', callback_data: 'w1Button' },
-        { text: '✅ w2', callback_data: 'w2Button' },
-        { text: 'w3', callback_data: 'w3Button' },
-      ],
-      [
-        { text: '≡📩ADD ORDER (%PRICE CHANGE)≡ ', callback_data: 'selectWalletsButton' },
-      ],
-      [
-        { text: '-10%', callback_data: '10%Button' },
-        { text: '-20%', callback_data: '20%Button' },
-        { text: '-30%', callback_data: '30%Button' },
-      ],
-      [
-        { text: '-40%', callback_data: '40%Button' },
-        { text: '-50%', callback_data: '50%Button' },
-        { text: 'Custom', callback_data: 'customButton' },
-      ],
-    ],
-  };
-  
-  
-  const replaceWallteKeyboard = {
-    inline_keyboard: [
-      [
-        { text: 'w1', callback_data: 'w1Button' },
-        { text: 'w2', callback_data: 'w2Button' },
-        { text: 'w3', callback_data: 'w3Button' },
-      ],
-      [
-        { text: '✖ Close', callback_data: 'closeButton' },
-      ],
-    ],
-  };
-  
-  
-  const importWalletKeyboard = {
-    inline_keyboard: [
-      [
         { text: 'Import Wallet', callback_data: 'importWalletButton' },
-        { text: 'Regenerate Link', callback_data: 'regenerateLinkButton' },
-        { text: '✖ Close', callback_data: 'closeButton' },
+      ],
+      [
+        { text: '🇬🇧 English', callback_data: 'usdcButton' },
       ],
     ],
   };
-  
-  
-  const watchlistKeyboard = {
+
+  const TransferToken = {
     inline_keyboard: [
       [
-        { text: '✖ Close', callback_data: 'closeButton' },
-        { text: '➕ Watchlist', callback_data: 'watchlistButton' },
+        { text: '↰ Menu', callback_data: 'menuButton' },
+        { text: '🗘Refresh', callback_data: 'refreshButton' },
+      ],
+      [
+        { text: '✅ W1', callback_data: 'w1Button' },
+        { text: 'W2', callback_data: 'w2Button' },
+        { text: 'W3', callback_data: 'w3Button' },
+      ],
+      [
+        { text: 'Custom ✏️', callback_data: 'customButton' },
       ],
     ],
   };
-  
+
+  const Referrals = {
+    inline_keyboard: [
+      [
+        { text: '↰ Menu', callback_data: 'menuButton' },
+      ],
+      [
+        { text: 'Set Fee Receiver Wallet', callback_data: 'recivewallet' },
+      ],
+    ],
+  };
+
+  const Positions = {
+    inline_keyboard: [
+      [
+        { text: '↰ Menu', callback_data: 'menuButton' },
+        { text: '🗘Refresh', callback_data: 'refreshButton' },
+      ],
+      [
+        { text: 'W1', callback_data: 'w1Button' },
+        { text: '✅ W2', callback_data: 'w2Button' },
+        { text: 'W3', callback_data: 'w3Button' },
+      ],
+    ],
+  };
+
+  const DCAOrders = {
+    inline_keyboard: [
+      [
+        { text: '↰ Menu', callback_data: 'menuButton' },
+        { text: 'X Remove All', callback_data: 'removeAllButton' },
+      ],
+      [
+        { text: '[+]DCA', callback_data: 'DCAButton' },
+      ],
+    ],
+  };
+
   bot.on('message', (msg) => {
     const chatId = msg.chat.id;
-  
+    console.log("🚀 ~ bot.on ~ chatId:", chatId)
+    const userId = msg.from.id;
+    console.log("🚀 ~ bot.on ~ userId:", userId)
     if (msg.text === '/start') {
       bot.sendMessage(chatId, 'Welcome to the bot! Type something in the textbox:', {
         reply_markup: {
           keyboard: [
-            [{ text: 'menu', request_contact: false, request_location: false }],
-            [{ text: 'buy', request_contact: false, request_location: false }],
-            [{ text: 'sell', request_contact: false, request_location: false }],
-            [{ text: 'watchlist', request_contact: false, request_location: false }],
+            [{ text: 'SignUp', request_contact: false, request_location: false }],
+            [{ text: 'Start', request_contact: false, request_location: false }],
+            [{ text: 'Buy', request_contact: false, request_location: false }],
+            [{ text: 'Sell', request_contact: false, request_location: false }],
+            [{ text: 'Withdraw', request_contact: false, request_location: false }],
+            [{ text: 'Setting', request_contact: false, request_location: false }],
           ],
           resize_keyboard: true,
           one_time_keyboard: true,
         },
       });
-    } else if (msg.text === 'menu') {
-      bot.sendMessage(chatId, 'Choose an option:', { reply_markup: JSON.stringify(menuKeyboard) });
-    } else if (msg.text === 'buy') {
-      bot.sendMessage(chatId, 'Choose an option:', { reply_markup: JSON.stringify(buyKeyboard) });
-    } else if (msg.text === 'sell') {
-      bot.sendMessage(chatId, `Gas: 29   ═   Block: 19181025   ═   ETH: $2428
-      ➖  Sell Tokens | Tutorial   ➖
-      Set your sell settings in the menu below and then enter the lines numbers of the tokens you wish to sell. Selling using high slippage can result in being frontrun or sandwiched. Use private transactions to avoid sandwich attacks.•Sell Amount: the % of your bag you wish to sell
-      •Slippage: Definition 
-      • 🔬 Aggregation: For all swaps, we compare quotes from aggregators and simulate results to maximize your trades.
-      • 🌟 Easy Mode automatically use the safest and optimal settings for your swaps, ensuring that you receive the best price possible..` , { reply_markup: JSON.stringify(sellKeyboard) });
-    } else if (msg.text === 'watchlist') {
-      bot.sendMessage(chatId, `Gas: 49   ═   Block: 19182461   ═   ETH: $2415
-  
-      ═🔭 Watchlist 🔭═
-      1. PEPE(Eth)   : $0.00000096 | MC: $397012415 
-        24h: ↑2.32%    | 1h: ↑0.38%
-          Analysis-Fastswap (http://t.me/unibotsniper_bot?start=6982508145454Ce325dDbE47a25d4ec3d2311933_aQsVw) | Chart (https://geckoterminal.com/eth/tokens/0x6982508145454Ce325dDbE47a25d4ec3d2311933) | Etherscan (https://etherscan.io/token/0x6982508145454Ce325dDbE47a25d4ec3d2311933) -- [ ❌ ] (http://t.me/unibotsniper_bot?start=0x6982508145454Ce325dDbE47a25d4ec3d2311933_wDelVw)
+    } else if (msg.text === 'SignUp') {
+      bot.onText(/SignUp/, (msg) => {
+        const chatId = msg.chat.id;
+        bot.sendMessage(chatId, 'Please provide your name:');
+        bot.once('message', async (nameMsg) => {
+          const name = nameMsg.text;
+
+          bot.sendMessage(chatId, 'Please provide your email:');
+          bot.once('message', async (emailMsg) => {
+            const email = emailMsg.text;
+
+            bot.sendMessage(chatId, 'Please provide your password:');
+            bot.once('message', async (passwordMsg) => {
+              const password = passwordMsg.text;
+
+              bot.sendMessage(chatId, 'Please confirm your password:');
+              bot.once('message', async (confirmPasswordMsg) => {
+                const confirmPassword = confirmPasswordMsg.text;
+
+                if (password !== confirmPassword) {
+                  bot.sendMessage(chatId, 'Passwords does not match. Please try again.');
+                  return;
+                }
+
+                try {
+                  const userExists = await UserModel.findOne({ email });
+                  if (userExists) {
+                    bot.sendMessage(chatId, 'User with this email already exists.');
+                    return;
+                  }
+
+                  // Register a new user
+                  const response = await axios.post(`${API_URL}/signup`, {
+                    name,
+                    email,
+                    password,
+                    confirmPassword,
+                    chatId
+                  });
+                  console.log("🚀 ~ bot.once ~ response:", response)
+                  const { message, data } = response.data;
+                  await bot.sendMessage(chatId, `User registered successfully. Email: ${data.email}`);
+
+                  // Ask the user to provide their email for verification
+                  bot.sendMessage(chatId, 'Please provide your email:');
+                  bot.once('message', async (emailMsg) => {
+                    const email = emailMsg.text;
+
+                    // Ask the user for OTP
+                    bot.sendMessage(chatId, 'Please Check Your Email & Enter your OTP:');
+                    bot.once('message', async (otpMsg) => {
+                      const otp = otpMsg.text;
+
+                      try {
+                        // Verify the user with OTP
+                        const response = await axios.post(`${API_URL}/verify`, {
+                          email,
+                          otp,
+                        });
+
+                        if (response.data.status === true) {
+                          const { message, data } = response.data;
+                          await bot.sendMessage(chatId, `User verified successfully`);
+                          // Retrieve the wallet address from the database
+                          const user = await UserModel.findOne({ email: email });
+                          console.log("🚀 ~ bot.once ~ user:", user)
+                          const wallet = user ? user.wallet : null;
+
+                          if (wallet) {
+                            await bot.sendMessage(chatId, `This is Your WalletAddress : ${wallet}`);
+                          } else {
+                            await bot.sendMessage(chatId, `User wallet address not available.`);
+                          }
+                        } else if (response.data.status === false) {
+                          bot.sendMessage(chatId, `Invalid OTP. Please enter a valid OTP.`);
+                        }
+                      } catch (error) {
+                        console.error('Error:', error.message);
+                        bot.sendMessage(chatId, `An error occurred while verifying the user: ${error.message}`);
+                      }
+                    });
+                  });
+                } catch (error) {
+                  console.error('Error:', error.message);
+                  bot.sendMessage(chatId, `An error occurred while registering the user: ${error.message}`);
+                }
+              });
+            });
+          });
+        });
+      });
+
+
+
+      bot.onText(/\/login/, (msg) => {
+        const chatId = msg.chat.id;
+        bot.sendMessage(chatId, 'Please provide your email:');
+        bot.once('message', async (emailMsg) => {
+          const email = emailMsg.text;
+          bot.sendMessage(chatId, 'Please provide your password:');
+          bot.once('message', async (passwordMsg) => {
+            const password = passwordMsg.text;
+            try {
+              // Login the user
+              const response = await axios.post(`${API_URL}/login`, {
+                email,
+                password,
+              });
+              if (response.data.status === true) {
+                // Send a message with an inline keyboard button to redirect to the website
+                bot.sendMessage(chatId, `Login successful!`, {
+                  reply_markup: JSON.stringify({
+                    inline_keyboard: [
+                      [{
+                        text: 'Go to website',
+                        url: WEBSITE_URL
+                      }]
+                    ]
+                  })
+                });
+              } else {
+                bot.sendMessage(chatId, 'Invalid email or password. Please try again.');
+              }
+            } catch (error) {
+              console.error('Error:', error.message);
+              bot.sendMessage(chatId, `An error occurred while logging in: ${error.message}`);
+            }
+          });
+        });
+      });
+
+    } else if (msg.text === 'Start') {
+      const messageText = `ETH: $3293 ═ BTC: $66867 ═ Gas: 12 gwei
+      🦄 WaveBot | Website  | Tutorials | Solana Bot 🦄
       
-      ═🧭 Recent Tokens 🧭═
-         No tokens in recent list`, { reply_markup: JSON.stringify(watchlistKeyboard) });
+      ══ Your Wallets ══
+      w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
+      0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
+      
+      w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
+      0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
+      
+      w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
+      0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
+
+      ‧‧────────────────‧‧
+      Main Bot | Backup #1 | Backup #2 | Backup #3`;
+      bot.sendMessage(chatId, messageText, { reply_markup: JSON.stringify(buyKeyboard) });
+
+    } else if (msg.text === 'Buy') {
+      const messageText = `ETH: $3293 ═ BTC: $66867 ═ Gas: 12 gwei
+      🦄 WaveBot | Website  | Tutorials | Solana Bot 🦄
+      
+      ══ Your Wallets ══
+      w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
+      0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
+      
+      w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
+      0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
+      
+      w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
+      0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
+
+      ‧‧────────────────‧‧
+      Main Bot | Backup #1 | Backup #2 | Backup #3`;
+      bot.sendMessage(chatId, messageText, { reply_markup: JSON.stringify(buyKeyboard) });
+
+    } else if (msg.text === 'Sell') {
+      const messageText = `
+      ══ Select a token to sell | Chain: Ethereum ══
+      Wallet: w2(0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da)
+
+      No token found (value > $10)
+      
+      Page: 1/1 
+      ‧‧────────────────‧‧
+      If you do not see your token:
+      1. Check your selected wallet.
+      2. Click Custom ✏️ to sell with custom token address.`
+      bot.sendMessage(chatId, messageText, { reply_markup: JSON.stringify(sellKeyboard) });
+
+    } else if (msg.text === 'Withdraw') {
+      const messageText = `ETH: $3293 ═ BTC: $66867 ═ Gas: 12 gwei
+      🦄 WaveBot | Website  | Tutorials | Solana Bot 🦄
+      
+      ══ Your Wallets ══
+      w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
+      0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
+      
+      w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
+      0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
+      
+      w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
+      0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
+
+      ‧‧────────────────‧‧
+      Main Bot | Backup #1 | Backup #2 | Backup #3`;
+      bot.sendMessage(chatId, messageText, { reply_markup: JSON.stringify(WithdrawKeyboard) });
+
     } else {
       bot.sendMessage(chatId, `You typed: ${msg.text}`);
     }
   });
-  
-  bot.on('callback_query', (callbackQuery) => {
+
+  bot.on('callback_query', async (callbackQuery) => {
     const chatId = callbackQuery.message.chat.id;
     const messageId = callbackQuery.message.message_id;
     const data = callbackQuery.data;
-    let sendVideoPath = 'DemoVideo.mp4';
-  
+    let WebSiteLink = 'https://marketing-dashboard-beta.vercel.app/';
+
     switch (data) {
-      case 'buyTokensButton':
-        bot.sendMessage(chatId, 'Buy Token button clicked', { reply_markup: JSON.stringify(buyKeyboard) });
+      case 'buyButton':
+        bot.sendMessage(chatId, '✏️ Enter the token address you want to buy:');
         break;
-      case 'sellTokensButton':
-        bot.sendMessage(chatId, `✎ Enter the line numbers of the tokens you wish to sell seperated by commas:
-        (eg. entering 1,2 will immediately sell tokens in line 1,2)
+      case 'sellButton':
+        bot.sendMessage(chatId, `
+        ══ Select a token to sell | Chain: Ethereum ══
+        Wallet: w2(0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da)
+  
+        No token found (value > $10)
         
-        ═ Ethereum ═
-        None`);
+        Page: 1/1 
+        ‧‧────────────────‧‧
+        If you do not see your token:
+        1. Check your selected wallet.
+        2. Click Custom ✏️ to sell with custom token address.`, { reply_markup: JSON.stringify(sellKeyboard) });
         break;
       case 'menuButton':
-        bot.sendMessage(chatId, 'Menu Click', { reply_markup: JSON.stringify(menuKeyboard) });
+        bot.sendMessage(chatId, `
+        ETH: $3293 ═ BTC: $66867 ═ Gas: 12 gwei
+        🦄 WaveBot | Website  | Tutorials | Solana Bot 🦄
+        
+        ══ Your Wallets ══
+        w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
+        0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
+        
+        w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
+        0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
+        
+        w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
+        0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
+  
+        ‧‧────────────────‧‧
+        Main Bot | Backup #1 | Backup #2 | Backup #3`
+          , { reply_markup: JSON.stringify(buyKeyboard) });
         break;
       case 'closeButton':
         bot.editMessageText('Menu closed.', { chat_id: chatId, message_id: messageId });
         break;
-      case 'buyLimitButton':
-        bot.sendMessage(chatId, 'Click Limit Button', { reply_markup: JSON.stringify(buyLimitKeyboard) });
-        break;
-      case 'sellLimitButton':
-        bot.sendMessage(chatId, '⚠️ Your wallets do not have any tokens of value.');
+      case 'importWalletButton':
+        bot.sendMessage(chatId, 'Click [here](' + WebSiteLink + ') to import your wallet.', { parse_mode: 'Markdown' });
         break;
       case 'settingButton':
-        bot.sendMessage(chatId, 'Setting Open.', { reply_markup: JSON.stringify(settingKeyboard) });
+        bot.sendMessage(chatId, '═ Settings ═', { reply_markup: JSON.stringify(settingKeyboard) });
         break;
-      case 'replaceWalletButton':
-        bot.sendMessage(chatId, `🔧 Replace Wallet - Which wallet do you want to replace?
+      case 'withdrawButton':
+        bot.sendMessage(chatId, `
+        ETH: $3293 ═ BTC: $66867 ═ Gas: 12 gwei
+        🦄 WaveBot | Website  | Tutorials | Solana Bot 🦄
+        
+        ══ Your Wallets ══
+        w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
+        0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
+        
+        w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
+        0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
+        
+        w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
+        0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
   
-        ⚠️ Warning: Replaced wallets cannot be recovered.`, { reply_markup: JSON.stringify(replaceWallteKeyboard) });
+        ‧‧────────────────‧‧
+        Main Bot | Backup #1 | Backup #2 | Backup #3`, { reply_markup: JSON.stringify(TransferToken) });
         break;
-      case 'importWalletButton':
-        bot.sendMessage(chatId, `☁️ Import Wallet ☁️
-        Import a wallet through Unibot Cloud functions by clicking the button below. To ensure that user data is safe and secure, the link below self-destructs after use or after 10 minutes of inactivity.
+      case 'positionButton':
+        bot.sendMessage(chatId, `
+        ═ Your Positions | Chain: Ethereum ═
+        Wallet: w2 (0xFEa2..a8Da)
         
-        ⚠️ Warning: Replaced wallets cannot be recovered.`, { reply_markup: JSON.stringify(importWalletKeyboard) })
+        No tokens found (value ≥ $10).
+
+        Page: 1/1`, { reply_markup: JSON.stringify(Positions) });
         break;
-      case 'privateKeysButton':
-        bot.sendMessage(chatId, '🔐 Enter your password to view your private keys:');
+      case 'DCAButton':
+        bot.sendMessage(chatId, '✏️ Enter the token address you want to buy:');
         break;
-      case 'referralButton':
-        bot.sendMessage(chatId, '🛂 Enter a referral code to set for your account:');
+      case 'DCAOrdersButton':
+        bot.sendMessage(chatId, '═ DCA Orders  |  Total: 0 ═', { reply_markup: JSON.stringify(DCAOrders) });
         break;
-      case 'linkWalletButton':
-        bot.sendMessage(chatId, `🔗 Enter the signature code of the wallet you wish to link.
-  
-        Linked Wallet:
-        No wallets are linked to this Telegram account.:`);
+      case 'customButton':
+        bot.sendMessage(chatId, '✏️ Enter token address to sell.');
         break;
-      case 'FlexButton':
-        bot.sendMessage(chatId, '🌐 Enter CA and referral code (if applicable) to generate flex:');
+      case 'removeAllButton':
+        bot.sendMessage(chatId, '✅ Removed all open dca orders, please wait for transactions to confirm.');
         break;
-      case 'walletAnaiysisButton':
-        bot.sendMessage(chatId, '📈 Wallet Analysis: Which wallet would you like to view analysis for?', { reply_markup: JSON.stringify(walletAnalysisKeyboard) });
-        break;
-      case 'snipersButton':
-        bot.sendMessage(chatId, `═🎯  Sniper Menu (ERC-20)  🎯═`, { reply_markup: JSON.stringify(sniperMenuKeyboard) })
-        break;
-      case 'snipermenuButton':
-        bot.sendMessage(chatId, '═🎯  Sniper Menu (ERC-20)  🎯═ ', { reply_markup: JSON.stringify(sniperMenuKeyboard) })
-        break;
-      case 'tokenBalancesButton':
-        bot.sendMessage(chatId, `Gas: 20   ═   Block: 19140289   ═   ETH: $2302
-        🌑  Token Balances  🌑  
+      case 'referralsButton':
+        bot.sendMessage(chatId, `
+        ═ Referrals | Refer Users & Earn ═
+        Share your referral link(s) and earn 25% of swap fees from users who click your link. Withdraw earnings using your Fee Receiver Wallet.
         
-        ═ Ethereum ═
-        None`, { reply_markup: JSON.stringify(totalbalanceKeyboard) })
-        break;
-      case 'autoSniperMenuButton':
-        bot.sendMessage(chatId, `Gas: 16   ═   Block: 19138867   ═   ETH: $2293
-        ══🎯  Auto Sniper | Tutorial (https://learn.unibot.app/product-guides/method-sniper)  🎯══
-        Auto Sniper: Automatically snipe tokens when the amount of users sniping the token hits your threshold number. Autosnipes use First or Fail settings which means you only hit when you are bottom of the block which significantly reduces risk.`, { reply_markup: JSON.stringify(autosniperMenuKeyboard) })
-        break;
-      case 'waveBotButton':
-        bot.sendVideo(chatId, sendVideoPath, {
-          caption: `WaveBot: Trade smarter and faster through our webapp. Tutorials
+        Fee Receiver Wallet: Not Set
         
-  Click the link below to login directly to Unibot X. The link is single use and lasts for 5 minutes.` });
+        Link #1:https://marketing-dashboard-beta.vercel.app/ `, { reply_markup: JSON.stringify(Referrals) });
+        break;
+      case 'transferTokenButton':
+        bot.sendMessage(chatId, `
+        ═ Transfer Token ═
+        Select a token from Etherscanto transfer:
+        
+        ‧‧────────────────‧‧
+        If you do not see your token:
+        1. Check your selected wallet.
+        2. Click Custom ✏️ to sell with custom token address.`, { reply_markup: JSON.stringify(TransferToken) });
+        break;
+      case 'basechainButton':
+        bot.sendMessage(chatId, `Click Custom ✏️ to sell with custom token address.`, { reply_markup: JSON.stringify(UserdataKeyboard) });
+        break;
+      case 'SwaptokenButton':
+        let fromtoken
+        let totoken
+        let amountIn
+        bot.sendMessage(chatId, 'from Token:');
+        bot.once('message', async (fromToken) => {
+          fromtoken = fromToken.text;
+          bot.sendMessage(chatId, 'To Token:');
+          bot.once('message', async (totoken) => {
+            totoken = totoken.text;
+            bot.sendMessage(chatId, 'amount in:');
+            bot.once('message', async (amountIn) => {
+              // console.log("🚀 ~ bot.once ~ amountIn:", amountIn)
+              amountIn = amountIn.text;
+              const swaptoken = await controller.mainswap(fromtoken, totoken, amountIn)
+              // console.log("🚀 ~ bot.once ~ swaptoken:", swaptoken)
+              bot.sendMessage(chatId,`transection hash : ${swaptoken}`);
+              bot.sendMessage(chatId,`transection successfully`);
+
+            })
+
+          })
+        })
+
+        break;
+      case 'balanceButton':
+        bot.sendMessage(chatId, 'Please provide your Wallet Address:');
+        bot.once('message', async (walletmessage) => {
+          console.log("🚀 ~ bot.once ~ emailMsg:", walletmessage)
+          const wallet = walletmessage.text;
+          console.log("🚀 ~ bot.once ~ wallet:", wallet)
+          const balancedata = await controller.fetchBalance(wallet)
+          let message = "Balance:\n";
+          balancedata.forEach((item, index) => {
+            message += `${index + 1}. Name: ${item.name}, Amount: ${item.balance}\n`; // Modify this based on your object structure
+          });
+          bot.sendMessage(chatId, message);
+        })
         break;
       default:
         console.log(`Unknown button clicked: ${data}`);
     }
   });
-  
   console.log('Bot started!');
   console.log('Server running');
 }
