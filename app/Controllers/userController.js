@@ -483,15 +483,16 @@ async function fetchBalance(wallet) {
 }
 
 
-async function mainswap(token0, token1, amountIn) {
+async function mainswap(token0, token1, amountIn, chainId) {
     try {
         console.log('token0', token0, 'token1', token1, amountIn)
-        const poolAddress = await pooladress(token0, token1)
+        const poolAddress = await pooladress(token0, token1 ,chainId)
         console.log("🚀 ~ SwapToken ~ poolAddress:", poolAddress)
         //   const getPoolImmutables = await getPoolImmutables(poolContract)
         //   const getPoolState = await getPoolState(poolContract)
         if (poolAddress) {
-            const executeSwap = await swapToken(token0, token1, poolAddress[0], amountIn)
+            const executeSwap = await swapToken(token0, token1, poolAddress[0], amountIn ,chainId)
+            console.log("-------------------------> mainswap", executeSwap.msg)
             return executeSwap
         }
         // if (!executeSwap) {
@@ -509,6 +510,8 @@ async function mainswap(token0, token1, amountIn) {
         //    let saveData = await obj.save()
     } catch (error) {
         console.log(error)
+        return error.reason
+
     }
 
 }

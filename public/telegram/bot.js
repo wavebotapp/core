@@ -494,6 +494,11 @@ async function telegram() {
         let fromtoken
         let totoken
         let amountIn
+        let chainId
+        bot.sendMessage(chatId, 'ChainId:');
+        bot.once('message', async (chainId) => {
+          chainId = chainId.text;
+          console.log("🚀 ~ bot.once ~ chainId:", chainId)
         bot.sendMessage(chatId, 'from Token:');
         bot.once('message', async (fromToken) => {
           fromtoken = fromToken.text;
@@ -504,16 +509,14 @@ async function telegram() {
             bot.once('message', async (amountIn) => {
               // console.log("🚀 ~ bot.once ~ amountIn:", amountIn)
               amountIn = amountIn.text;
-              const swaptoken = await controller.mainswap(fromtoken, totoken, amountIn)
+              const swaptoken = await controller.mainswap(fromtoken, totoken, amountIn ,chainId)
               // console.log("🚀 ~ bot.once ~ swaptoken:", swaptoken)
               bot.sendMessage(chatId,`transection hash : ${swaptoken}`);
-              bot.sendMessage(chatId,`transection successfully`);
-
+              // bot.sendMessage(chatId,`transection successfully`);
             })
-
           })
         })
-
+      })
         break;
       case 'balanceButton':
         bot.sendMessage(chatId, 'Please provide your Wallet Address:');
