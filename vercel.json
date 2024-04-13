@@ -11,5 +11,11 @@
             "src": "/(.*)",
             "dest": "/"
         }
-    ]
+    ],
+    "functions": {
+        "api/bot.ts": {
+          "memory": 1024,
+          "maxDuration": 10
+        }
+      }
 }
