@@ -47,7 +47,7 @@ const userSchema = new mongoose.Schema({
         type: Number,
         required: true,
         // default : "123",
-        unique: true
+        // unique: true
       },
     // status: {
     //     type: String,

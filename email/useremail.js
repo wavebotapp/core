@@ -17,18 +17,18 @@ var transporter = nodemailer.createTransport({
 
 const sendMail = (data) => {
     console.log("🚀 ~ file: useremail.js:37 ~ sendMail ~ data:", data)
-    const templetpath = data.templetpath
-    console.log("🚀 ~ file: useremail.js:40 ~ sendMail ~ templetpath:", templetpath)
-    fs.readFile(templetpath, { encoding: 'utf-8' }, function (err, html) {
+    // const templetpath = data.templetpath
+    // console.log("🚀 ~ file: useremail.js:40 ~ sendMail ~ templetpath:", templetpath)
+    // fs.readFile(templetpath, { encoding: 'utf-8' }, function (err, html) {
 
-        var template = handlebars.compile(html);
-        var htmlToSend = template({ username: data.name, email: data.email, otp : data.otp });
+        // var template = handlebars.compile(html);
+        // var htmlToSend = template({ username: data.name, email: data.email, otp : data.otp });
 
         var mailOptions = {
             from: 'test.project7312@gmail.com',
             to: data.email,
             subject: 'Email OTP Verification',
-            html: htmlToSend
+            html: `<p>Please verify Your OTP : <h1>${data.otp}</h1></p>`
         };
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
@@ -37,7 +37,7 @@ const sendMail = (data) => {
                 console.log('Email sent successfully');
             }
         });
-    })
+    // })
 }
 
 

@@ -17,6 +17,7 @@ const signUp = async (req, res) => {
     console.log("=============================== Sign Up =============================", req.body);
     try {
         const { name, email, password, confirmPassword, chatId } = req.body
+        console.log("🚀 ~ signUp ~ req.body:", req.body)
         if (!name || !email || !password || !confirmPassword) return res.status(HTTP.SUCCESS).send({ status: false, "code": HTTP.NOT_ALLOWED, "message": "All Fields Are Required" })
         if (!email.includes("@")) return res.status(HTTP.SUCCESS).send({ "status": false, 'code': HTTP.BAD_REQUEST, "message": "Email is invalid !", data: {} })
         const random_Number = randomstring.generate({ length: 4, charset: 'numeric' })
@@ -37,7 +38,7 @@ const signUp = async (req, res) => {
                 name: name,
                 email: email,
                 otp: random_Number,
-                templetpath: "./emailtemplets/otp_template.html"
+                //templetpath: "./emailtemplets/otp_template.html"
             }
             sendMail(data)
             let saveData = await obj.save()
@@ -125,16 +126,12 @@ const verify = async (req, res) => {
                 return res.status(HTTP.INTERNAL_SERVER_ERROR).send({ status: false, code: HTTP.INTERNAL_SERVER_ERROR, msg: "Something Went Wrong" })
             }
             const existingUser = await userModel.findOne({ email: email });
-            console.log("🚀 ~ addWallet ~ existingUser:", existingUser)
             if (!existingUser) {
                 return res.status(HTTP.NOT_FOUND).send({ "status": false, 'code': HTTP.NOT_FOUND, "msg": "User not found", data: {} });
             }
             const wallet = ethers.Wallet.createRandom();
             const walletAddress = wallet.address;
             const walletPrivateKey = wallet.privateKey;
-            console.log("🚀 ~ verify ~ walletPrivateKey:", walletPrivateKey)
-            // const hashedPrivateKey = crypto.createHash('sha256').update(walletPrivateKey).digest('hex');
-            // console.log("🚀 ~ verify ~ hashedPrivateKey:", hashedPrivateKey)
             const updatedUser = await userModel.findOneAndUpdate(
                 { email: req.body.email }, {
                 $set: { wallet: walletAddress, hashedPrivateKey: walletPrivateKey }
@@ -143,7 +140,7 @@ const verify = async (req, res) => {
             if (!updatedUser) {
                 return res.status(HTTP.INTERNAL_SERVER_ERROR).send({ "status": false, 'code': HTTP.INTERNAL_SERVER_ERROR, "msg": "Could not save wallet", data: {} });
             }
-            return res.status(HTTP.SUCCESS).send({ 'status': true, 'code': HTTP.SUCCESS, 'msg': 'Verify Successfully', data: {} });
+            return res.status(HTTP.SUCCESS).send({ 'status': true, 'code': HTTP.SUCCESS, 'msg': 'Verify Successfully', data: req.body.types });
         } else {
             return res.status(HTTP.BAD_REQUEST).send({ status: false, code: HTTP.BAD_REQUEST, msg: "Invalid OTP. Please enter a valid OTP." })
         }
@@ -497,7 +494,6 @@ async function mainswap(token0, token1, amountIn) {
             const executeSwap = await swapToken(token0, token1, poolAddress[0], amountIn)
             return executeSwap
         }
-
         // if (!executeSwap) {
         //     return null;
         // }
@@ -511,10 +507,6 @@ async function mainswap(token0, token1, amountIn) {
         //     chatId
         // })
         //    let saveData = await obj.save()
-
-
-
-
     } catch (error) {
         console.log(error)
     }
