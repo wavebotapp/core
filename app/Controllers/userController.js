@@ -32,7 +32,7 @@ const signUp = async (req, res) => {
                 email: email,
                 password: bpass,
                 otp: random_Number,
-                chatId: chatId
+                chatId: "1234"
             })
             const data = {
                 name: name,
