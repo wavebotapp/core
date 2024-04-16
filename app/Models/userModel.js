@@ -43,7 +43,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-    chatId: {
+    token: {
+        type: String
+    },
+    userId: {
         type: Number,
         required: true,
         // default : "123",

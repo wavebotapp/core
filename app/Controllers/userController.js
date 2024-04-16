@@ -16,8 +16,8 @@ const { swapToken } = require("../Controllers/uniswapTrader")
 const signUp = async (req, res) => {
     console.log("=============================== Sign Up =============================", req.body);
     try {
-        const { name, email, password, confirmPassword, chatId } = req.body
-        console.log("🚀 ~ signUp ~ req.body:", req.body)
+        const { name, email, password, confirmPassword, userId } = req.body
+        console.log("🚀 ~ signUp ~ req.body:", req.body.userId)
         if (!name || !email || !password || !confirmPassword) return res.status(HTTP.SUCCESS).send({ status: false, "code": HTTP.NOT_ALLOWED, "message": "All Fields Are Required" })
         if (!email.includes("@")) return res.status(HTTP.SUCCESS).send({ "status": false, 'code': HTTP.BAD_REQUEST, "message": "Email is invalid !", data: {} })
         const random_Number = randomstring.generate({ length: 4, charset: 'numeric' })
@@ -32,7 +32,7 @@ const signUp = async (req, res) => {
                 email: email,
                 password: bpass,
                 otp: random_Number,
-                chatId: "1234"
+                userId: userId
             })
             const data = {
                 name: name,
@@ -85,29 +85,6 @@ const login = async (req, res) => {
         return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.INTERNAL_SERVER_ERROR, msg: "Something Went Wrong", error: error.msg })
     }
 }
-
-// Verify User
-// const verify = async (req, res) => {
-//     console.log("===================== Verify =================", req.body)
-//     try {
-//         const email = req.body.email;
-//         const otp = req.body.otp;
-//         if (!email) return res.status(HTTP.SUCCESS).send({ status: false, "code": HTTP.NOT_ALLOWED, "msg": "Email Is Required", data: {} })
-//         if (!email.includes("@")) return res.status(HTTP.SUCCESS).send({ "status": false, 'code': HTTP.BAD_REQUEST, "msg": "Email is invalid !", data: {} })
-//         const findEmail = await userModel.findOne({ email: email })
-//         if (!findEmail) {
-//             return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, msg: "You Are Not Register" })
-//         }
-//         if (findEmail.otp == otp) {
-//             const Update = await userModel.findOneAndUpdate({ email: email }, { verify: true, otp: 0 }, { new: true })
-//             return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, msg: "Verify Successfully", data: req.body.types })
-//         } else {
-//             return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, msg: "Please Enter Valid OTP" })
-//         }
-//     } catch (error) {
-//         return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.INTERNAL_SERVER_ERROR, msg: "Something Went Wrong", error: error.msg })
-//     }
-// }
 
 const verify = async (req, res) => {
     console.log("===================== Verify =================", req.body)
@@ -492,7 +469,7 @@ async function mainswap(token0, token1, amountIn, chainId) {
         //   const getPoolState = await getPoolState(poolContract)
         if (poolAddress) {
             const executeSwap = await swapToken(token0, token1, poolAddress[0], amountIn ,chainId)
-            console.log("-------------------------> mainswap", executeSwap.msg)
+            //console.log("-------------------------> mainswap", executeSwap.msg)
             return executeSwap
         }
         // if (!executeSwap) {

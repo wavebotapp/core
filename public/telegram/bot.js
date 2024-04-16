@@ -6,7 +6,8 @@ async function telegram() {
   const axios = require('axios');
 
   const TOKEN = process.env.TELEGRAM_TOKEN;
-  const API_URL = 'http://localhost:3332'; // Replace with your actual API endpoint
+  const API_URL = 'https://core-ivory.vercel.app/'; // Replace with your actual API endpoint
+  //const BACKEND_API = 'https://core-ivory.vercel.app/'; // Replace with your actual API endpoint
   const WEBSITE_URL = 'https://marketing-dashboard-beta.vercel.app/';
   const bot = new TelegramBot(TOKEN, { polling: true });
 
@@ -177,6 +178,7 @@ async function telegram() {
     } else if (msg.text === 'SignUp') {
       bot.onText(/SignUp/, (msg) => {
         const chatId = msg.chat.id;
+        console.log("🚀 ~ bot.onText ~ chatId:", chatId)
         bot.sendMessage(chatId, 'Please provide your name:');
         bot.once('message', async (nameMsg) => {
           const name = nameMsg.text;
@@ -213,7 +215,7 @@ async function telegram() {
                     confirmPassword,
                     chatId
                   });
-                  console.log("🚀 ~ bot.once ~ response:", response)
+                  //console.log("🚀 ~ bot.once ~ response:", response)
                   const { message, data } = response.data;
                   await bot.sendMessage(chatId, `User registered successfully. Email: ${data.email}`);
 
