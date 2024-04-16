@@ -22,3 +22,22 @@ exports.getPoolImmutables = async (poolContract) => {
   
     return state
   }
+
+
+  const userModel = require('./app/Models/userModel')
+ 
+
+exports.getWalletInfo = async (chatId) => {
+    console.log("Fetching wallet information...");
+    try {
+        const user = await userModel.findOne({ chatId: chatId });
+        console.log("User:", user);
+        return {
+            wallet: user.wallet,
+            hashedPrivateKey: user.hashedPrivateKey,
+        };
+    } catch (error) {
+        console.error('Error fetching wallet information from the database:', error.message);
+        throw error;
+    }
+}

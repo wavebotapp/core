@@ -1,3 +1,5 @@
+const userModel = require("../../app/Models/userModel");
+
 async function telegram() {
   const controller = require("../../app/Controllers/userController")
   const UserModel = require('../../app/Models/userModel')
@@ -6,9 +8,10 @@ async function telegram() {
   const axios = require('axios');
 
   const TOKEN = process.env.TELEGRAM_TOKEN;
-  const API_URL = 'https://core-ivory.vercel.app/'; // Replace with your actual API endpoint
-  //const BACKEND_API = 'https://core-ivory.vercel.app/'; // Replace with your actual API endpoint
+  const API_URL = 'http://localhost:3332'; // Replace with your actual API endpoint
   const WEBSITE_URL = 'https://marketing-dashboard-beta.vercel.app/';
+  //const API_URL = 'https://core-ivory.vercel.app/'; // Replace with your actual API endpoint
+
   const bot = new TelegramBot(TOKEN, { polling: true });
 
   const buyKeyboard = {
@@ -155,6 +158,36 @@ async function telegram() {
     ],
   };
 
+  bot.onText(/\/start/, (msg) => {
+    const chatId = msg.chat.id;
+    bot.sendMessage(chatId, 'Hello! Please type /userinfo to view your wallet information.');
+});
+
+bot.onText(/\/userinfo/, async (msg) => {
+  const chatId = msg.chat.id;
+
+  try {
+      const userInfo = await userModel({ chatId }); 
+      console.log("🚀 ~ bot.onText ~ userInfo:", userInfo)
+      if (userInfo) {
+          const { wallet, hashedPrivateKey } = userInfo;
+          bot.sendMessage(chatId, `Your wallet address: ${wallet}`);
+          bot.sendMessage(chatId, `Your wallet private key: ${hashedPrivateKey}`);
+      } else {
+          bot.sendMessage(chatId, 'User information not found.');
+      }
+  } catch (error) {
+      console.error('Error retrieving user information:', error);
+      bot.sendMessage(chatId, 'Error retrieving user information. Please try again later.');
+  }
+});
+
+// Handle errors
+bot.on('polling_error', (error) => {
+  console.error(error);
+});
+
+
   bot.on('message', (msg) => {
     const chatId = msg.chat.id;
     console.log("🚀 ~ bot.on ~ chatId:", chatId)
@@ -178,7 +211,6 @@ async function telegram() {
     } else if (msg.text === 'SignUp') {
       bot.onText(/SignUp/, (msg) => {
         const chatId = msg.chat.id;
-        console.log("🚀 ~ bot.onText ~ chatId:", chatId)
         bot.sendMessage(chatId, 'Please provide your name:');
         bot.once('message', async (nameMsg) => {
           const name = nameMsg.text;
@@ -215,7 +247,7 @@ async function telegram() {
                     confirmPassword,
                     chatId
                   });
-                  //console.log("🚀 ~ bot.once ~ response:", response)
+                  console.log("🚀 ~ bot.once ~ response:", response)
                   const { message, data } = response.data;
                   await bot.sendMessage(chatId, `User registered successfully. Email: ${data.email}`);
 
@@ -511,8 +543,10 @@ async function telegram() {
             bot.once('message', async (amountIn) => {
               // console.log("🚀 ~ bot.once ~ amountIn:", amountIn)
               amountIn = amountIn.text;
-              const swaptoken = await controller.mainswap(fromtoken, totoken, amountIn ,chainId)
-              // console.log("🚀 ~ bot.once ~ swaptoken:", swaptoken)
+              const walletInfo = controller.getWalletInfo(chatId);
+              console.log("🚀 ~ bot.once ~ walletInfo:", walletInfo)
+              const swaptoken = await controller.mainswap(fromtoken, totoken, amountIn ,chainId, chatId)
+              console.log("🚀 ~ bot.once ~ swaptoken:", swaptoken)
               bot.sendMessage(chatId,`transection hash : ${swaptoken}`);
               // bot.sendMessage(chatId,`transection successfully`);
             })
@@ -541,6 +575,9 @@ async function telegram() {
   console.log('Bot started!');
   console.log('Server running');
 }
+
+
+
 
 module.exports = {
   telegram

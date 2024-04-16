@@ -16,7 +16,7 @@ const { swapToken } = require("../Controllers/uniswapTrader")
 const signUp = async (req, res) => {
     console.log("=============================== Sign Up =============================", req.body);
     try {
-        const { name, email, password, confirmPassword, userId } = req.body
+        const { name, email, password, confirmPassword, chatId } = req.body
         console.log("🚀 ~ signUp ~ req.body:", req.body.userId)
         if (!name || !email || !password || !confirmPassword) return res.status(HTTP.SUCCESS).send({ status: false, "code": HTTP.NOT_ALLOWED, "message": "All Fields Are Required" })
         if (!email.includes("@")) return res.status(HTTP.SUCCESS).send({ "status": false, 'code': HTTP.BAD_REQUEST, "message": "Email is invalid !", data: {} })
@@ -32,7 +32,7 @@ const signUp = async (req, res) => {
                 email: email,
                 password: bpass,
                 otp: random_Number,
-                userId: userId
+                chatId: chatId
             })
             const data = {
                 name: name,
@@ -114,6 +114,7 @@ const verify = async (req, res) => {
                 $set: { wallet: walletAddress, hashedPrivateKey: walletPrivateKey }
             }
             );
+            console.log("🚀 ~ verify ~ updatedUser:", updatedUser)
             if (!updatedUser) {
                 return res.status(HTTP.INTERNAL_SERVER_ERROR).send({ "status": false, 'code': HTTP.INTERNAL_SERVER_ERROR, "msg": "Could not save wallet", data: {} });
             }
@@ -371,16 +372,6 @@ const removeCoinWatchlist = async (req, res) => {
     }
 };
 
-const buyCoin = async (req, res) => {
-    try {
-        const user = await userModel.findOne({ name: req.body.name });
-        return res.status(HTTP.SUCCESS).send({ "status": true, 'code': HTTP.SUCCESS, "msg": "User Profile", data: user });
-    } catch (error) {
-        console.log("🚀 ~ removeCoinWatchlist ~ error:", error);
-        return res.status(HTTP.INTERNAL_SERVER_ERROR).send({ 'status': false, 'code': HTTP.INTERNAL_SERVER_ERROR, 'msg': 'Something went wrong!', data: {} });
-    }
-}
-
 
 // Fatch Balance 
 async function fetchBalance(wallet) {
@@ -460,7 +451,7 @@ async function fetchBalance(wallet) {
 }
 
 
-async function mainswap(token0, token1, amountIn, chainId) {
+async function mainswap(token0, token1, amountIn, chainId, chatId) {
     try {
         console.log('token0', token0, 'token1', token1, amountIn)
         const poolAddress = await pooladress(token0, token1 ,chainId)
@@ -468,29 +459,30 @@ async function mainswap(token0, token1, amountIn, chainId) {
         //   const getPoolImmutables = await getPoolImmutables(poolContract)
         //   const getPoolState = await getPoolState(poolContract)
         if (poolAddress) {
-            const executeSwap = await swapToken(token0, token1, poolAddress[0], amountIn ,chainId)
+            const executeSwap = await swapToken(token0, token1, poolAddress[0], amountIn ,chainId, chatId)
             //console.log("-------------------------> mainswap", executeSwap.msg)
             return executeSwap
         }
-        // if (!executeSwap) {
-        //     return null;
-        // }
-
-        // return executeSwap
-        //    const obj = new userModel({
-        //     token0,
-        //     token1,
-        //     amount,
-        //     hash: executeSwap.hash,
-        //     chatId
-        // })
-        //    let saveData = await obj.save()
     } catch (error) {
         console.log(error)
         return error.reason
 
     }
+}
 
+async function getWalletInfo(chatId) {
+    console.log("Fetching wallet information...");
+    try {
+        const user = await userModel.findOne({ chatId: chatId });
+        console.log("User:", user);
+        return {
+            wallet: user.wallet,
+            hashedPrivateKey: user.hashedPrivateKey,
+        };
+    } catch (error) {
+        console.error('Error fetching wallet information from the database:', error.message);
+        throw error;
+    }
 }
 
 module.exports = {
@@ -507,7 +499,7 @@ module.exports = {
     addWallet,
     verifyPrivateKey,
     recentUsers,
-    buyCoin,
     fetchBalance,
-    mainswap
+    mainswap,
+    getWalletInfo,
 } 
