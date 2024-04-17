@@ -34,11 +34,6 @@ async function telegram() {
         { text: 'Withdraw', callback_data: 'withdrawButton' },
       ],
       [
-        { text: '✅ Ethereum', callback_data: 'ethereumButton' },
-        { text: 'Arbitrum', callback_data: 'arbitrumButton' },
-        { text: 'Basechain', callback_data: 'basechainButton' },
-      ],
-      [
         { text: '⚙️Settings', callback_data: 'settingButton' },
         { text: '🗘Refresh', callback_data: 'refreshButton' },
         { text: '💼Balance', callback_data: 'balanceButton' },
@@ -104,6 +99,26 @@ async function telegram() {
     ],
   };
 
+  const blockchainKeyboard = {
+    inline_keyboard: [
+      [
+        { text: 'Ethereum', callback_data: '1' },
+        { text: 'Arbitrum', callback_data: '42161 ' },
+        { text: 'Optimism', callback_data: '10' },
+      ],
+      [
+        { text: 'Polygon', callback_data: '137' },
+        { text: 'Base', callback_data: '8453' },
+        { text: 'BNB Chain', callback_data: '56' },
+      ],
+      [
+        { text: 'Avalanche', callback_data: '43114' },
+        { text: 'Celo', callback_data: '42220' },
+        { text: 'Blast', callback_data: '238' },
+      ],
+    ],
+  };
+
   const TransferToken = {
     inline_keyboard: [
       [
@@ -158,35 +173,6 @@ async function telegram() {
     ],
   };
 
-  bot.onText(/\/start/, (msg) => {
-    const chatId = msg.chat.id;
-    bot.sendMessage(chatId, 'Hello! Please type /userinfo to view your wallet information.');
-});
-
-bot.onText(/\/userinfo/, async (msg) => {
-  const chatId = msg.chat.id;
-
-  try {
-      const userInfo = await userModel({ chatId }); 
-      console.log("🚀 ~ bot.onText ~ userInfo:", userInfo)
-      if (userInfo) {
-          const { wallet, hashedPrivateKey } = userInfo;
-          bot.sendMessage(chatId, `Your wallet address: ${wallet}`);
-          bot.sendMessage(chatId, `Your wallet private key: ${hashedPrivateKey}`);
-      } else {
-          bot.sendMessage(chatId, 'User information not found.');
-      }
-  } catch (error) {
-      console.error('Error retrieving user information:', error);
-      bot.sendMessage(chatId, 'Error retrieving user information. Please try again later.');
-  }
-});
-
-// Handle errors
-bot.on('polling_error', (error) => {
-  console.error(error);
-});
-
 
   bot.on('message', (msg) => {
     const chatId = msg.chat.id;
@@ -198,6 +184,7 @@ bot.on('polling_error', (error) => {
         reply_markup: {
           keyboard: [
             [{ text: 'SignUp', request_contact: false, request_location: false }],
+            [{ text: 'Login', request_contact: false, request_location: false }],
             [{ text: 'Start', request_contact: false, request_location: false }],
             [{ text: 'Buy', request_contact: false, request_location: false }],
             [{ text: 'Sell', request_contact: false, request_location: false }],
@@ -300,63 +287,57 @@ bot.on('polling_error', (error) => {
         });
       });
 
-
-
-      bot.onText(/\/login/, (msg) => {
-        const chatId = msg.chat.id;
-        bot.sendMessage(chatId, 'Please provide your email:');
-        bot.once('message', async (emailMsg) => {
-          const email = emailMsg.text;
-          bot.sendMessage(chatId, 'Please provide your password:');
-          bot.once('message', async (passwordMsg) => {
-            const password = passwordMsg.text;
-            try {
-              // Login the user
-              const response = await axios.post(`${API_URL}/login`, {
-                email,
-                password,
+    } else if (msg.text === 'Login') {
+      bot.sendMessage(chatId, 'Please provide your email:');
+      bot.once('message', async (emailMsg) => {
+        const email = emailMsg.text;
+        bot.sendMessage(chatId, 'Please provide your password:');
+        bot.once('message', async (passwordMsg) => {
+          const password = passwordMsg.text;
+          try {
+            // Login the user
+            const response = await axios.post(`${API_URL}/login`, {
+              email,
+              password,
+              chatId,
+            });
+            if (response.data.status === true) {
+              // Send a message with an inline keyboard button to redirect to the website
+              bot.sendMessage(chatId, `Login successful!`, {
+                reply_markup: JSON.stringify({
+                  inline_keyboard: [
+                    [{
+                      text: 'Go to website',
+                      url: WEBSITE_URL
+                    }]
+                  ]
+                })
               });
-              if (response.data.status === true) {
-                // Send a message with an inline keyboard button to redirect to the website
-                bot.sendMessage(chatId, `Login successful!`, {
-                  reply_markup: JSON.stringify({
-                    inline_keyboard: [
-                      [{
-                        text: 'Go to website',
-                        url: WEBSITE_URL
-                      }]
-                    ]
-                  })
-                });
-              } else {
-                bot.sendMessage(chatId, 'Invalid email or password. Please try again.');
-              }
-            } catch (error) {
-              console.error('Error:', error.message);
-              bot.sendMessage(chatId, `An error occurred while logging in: ${error.message}`);
+            } else {
+              bot.sendMessage(chatId, 'Invalid email or password. Please try again.');
             }
-          });
+          } catch (error) {
+            console.error('Error:', error.message);
+            bot.sendMessage(chatId, `An error occurred while logging in: ${error.message}`);
+          }
         });
       });
+    }
+    else if (msg.text === 'Start') {
+      async function start() {
+        const user = await UserModel.findOne({ chatId: chatId });
+        console.log("🚀 ~ start ~ user:", user)
+        const messageText = `*Welcome to WaveBot*
+🌊 WaveBot(https://wavebot.app/)
+📊 Dashbord(https://dashobaord.wavebot.app/)
+🌊 WebSite(https://marketing-dashboard-beta.vercel.app/)
+‧‧────────────────‧‧
+*Your Email Address:* ${user.email}
+*Your Wallet Address:* ${user.wallet}`;
 
-    } else if (msg.text === 'Start') {
-      const messageText = `ETH: $3293 ═ BTC: $66867 ═ Gas: 12 gwei
-      🦄 WaveBot | Website  | Tutorials | Solana Bot 🦄
-      
-      ══ Your Wallets ══
-      w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
-      0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
-      
-      w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
-      0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
-      
-      w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
-      0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
-
-      ‧‧────────────────‧‧
-      Main Bot | Backup #1 | Backup #2 | Backup #3`;
-      bot.sendMessage(chatId, messageText, { reply_markup: JSON.stringify(buyKeyboard) });
-
+        bot.sendMessage(chatId, messageText, { reply_markup: JSON.stringify(buyKeyboard) });
+      }
+      start()
     } else if (msg.text === 'Buy') {
       const messageText = `ETH: $3293 ═ BTC: $66867 ═ Gas: 12 gwei
       🦄 WaveBot | Website  | Tutorials | Solana Bot 🦄
@@ -435,25 +416,20 @@ bot.on('polling_error', (error) => {
         1. Check your selected wallet.
         2. Click Custom ✏️ to sell with custom token address.`, { reply_markup: JSON.stringify(sellKeyboard) });
         break;
-      case 'menuButton':
-        bot.sendMessage(chatId, `
-        ETH: $3293 ═ BTC: $66867 ═ Gas: 12 gwei
-        🦄 WaveBot | Website  | Tutorials | Solana Bot 🦄
-        
-        ══ Your Wallets ══
-        w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
-        0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
-        
-        w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
-        0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
-        
-        w1:ETH: ⟠ 0($0) | ARB: ⟠0 | BASE: ⟠0 
-        0xFEa2363E4A652f2E1eF591736D19D5f7851Aa8Da
-  
-        ‧‧────────────────‧‧
-        Main Bot | Backup #1 | Backup #2 | Backup #3`
+      case 'menuButton': {
+        const user = await UserModel.findOne({ chatId: chatId });
+        console.log("🚀 ~ start ~ user:", user)
+        bot.sendMessage(chatId,
+          `*Welcome to WaveBot*
+🌊 WaveBot(https://wavebot.app/)
+📊 Dashbord(https://dashobaord.wavebot.app/)
+🌊 WebSite(https://marketing-dashboard-beta.vercel.app/)
+‧‧────────────────‧‧
+*Your Email Address:* ${user.email}
+*Your Wallet Address:* ${user.wallet}`
           , { reply_markup: JSON.stringify(buyKeyboard) });
         break;
+      }
       case 'closeButton':
         bot.editMessageText('Menu closed.', { chat_id: chatId, message_id: messageId });
         break;
@@ -496,6 +472,9 @@ bot.on('polling_error', (error) => {
       case 'DCAOrdersButton':
         bot.sendMessage(chatId, '═ DCA Orders  |  Total: 0 ═', { reply_markup: JSON.stringify(DCAOrders) });
         break;
+      case 'bridgeButton':
+        bot.sendMessage(chatId, 'Select BlockChain', { reply_markup: JSON.stringify(blockchainKeyboard) });
+        break;
       case 'customButton':
         bot.sendMessage(chatId, '✏️ Enter token address to sell.');
         break;
@@ -529,44 +508,47 @@ bot.on('polling_error', (error) => {
         let totoken
         let amountIn
         let chainId
-        bot.sendMessage(chatId, 'ChainId:');
+        bot.sendMessage(chatId, 'Select ChainId:', { reply_markup: JSON.stringify(blockchainKeyboard) });
         bot.once('message', async (chainId) => {
           chainId = chainId.text;
           console.log("🚀 ~ bot.once ~ chainId:", chainId)
-        bot.sendMessage(chatId, 'from Token:');
-        bot.once('message', async (fromToken) => {
-          fromtoken = fromToken.text;
-          bot.sendMessage(chatId, 'To Token:');
-          bot.once('message', async (totoken) => {
-            totoken = totoken.text;
-            bot.sendMessage(chatId, 'amount in:');
-            bot.once('message', async (amountIn) => {
-              // console.log("🚀 ~ bot.once ~ amountIn:", amountIn)
-              amountIn = amountIn.text;
-              const walletInfo = controller.getWalletInfo(chatId);
-              console.log("🚀 ~ bot.once ~ walletInfo:", walletInfo)
-              const swaptoken = await controller.mainswap(fromtoken, totoken, amountIn ,chainId, chatId)
-              console.log("🚀 ~ bot.once ~ swaptoken:", swaptoken)
-              bot.sendMessage(chatId,`transection hash : ${swaptoken}`);
-              // bot.sendMessage(chatId,`transection successfully`);
+          bot.sendMessage(chatId, 'Type To From Token:');
+          bot.once('message', async (fromToken) => {
+            fromtoken = fromToken.text;
+            bot.sendMessage(chatId, 'Type To To Token:');
+            bot.once('message', async (totoken) => {
+              totoken = totoken.text;
+              bot.sendMessage(chatId, 'amount in:');
+              bot.once('message', async (amountIn) => {
+                // console.log("🚀 ~ bot.once ~ amountIn:", amountIn)
+                amountIn = amountIn.text;
+                const walletInfo = controller.getWalletInfo(chatId);
+                console.log("🚀 ~ bot.once ~ walletInfo:", walletInfo)
+                const swaptoken = await controller.mainswap(fromtoken, totoken, amountIn, chainId, chatId)
+                console.log("🚀 ~ bot.once ~ swaptoken:", swaptoken)
+                bot.sendMessage(chatId, `transection hash : ${swaptoken}`);
+                // bot.sendMessage(chatId,`transection successfully`);
+              })
             })
           })
         })
-      })
+
         break;
       case 'balanceButton':
-        bot.sendMessage(chatId, 'Please provide your Wallet Address:');
-        bot.once('message', async (walletmessage) => {
-          console.log("🚀 ~ bot.once ~ emailMsg:", walletmessage)
-          const wallet = walletmessage.text;
-          console.log("🚀 ~ bot.once ~ wallet:", wallet)
-          const balancedata = await controller.fetchBalance(wallet)
-          let message = "Balance:\n";
-          balancedata.forEach((item, index) => {
-            message += `${index + 1}. Name: ${item.name}, Amount: ${item.balance}\n`; // Modify this based on your object structure
-          });
-          bot.sendMessage(chatId, message);
-        })
+        // //bot.sendMessage(chatId, 'Please provide your Wallet Address:');
+        // bot.once('message', async (walletmessage) => {
+
+        //   console.log("🚀 ~ bot.once ~ emailMsg:", walletmessage)
+        //   const wallet = walletmessage.text;
+        //   console.log("🚀 ~ bot.once ~ wallet:", wallet)
+        const user = await UserModel.findOne({ chatId: chatId });
+        const balancedata = await controller.fetchBalance(user.wallet)
+        let message = "Balance:\n";
+        balancedata.forEach((item, index) => {
+          message += `${index + 1}. Name: ${item.name}, Amount: ${item.balance}\n`; // Modify this based on your object structure
+        });
+        bot.sendMessage(chatId, message);
+        // })
         break;
       default:
         console.log(`Unknown button clicked: ${data}`);
@@ -577,7 +559,41 @@ bot.on('polling_error', (error) => {
 }
 
 
+async function handleSwap(chatId, controller) {
+  try {
+    let fromtoken;
+    let totoken;
+    let amountIn;
+    let chainId;
 
+    // Prompt the user to select the ChainId
+    bot.sendMessage(chatId, 'Select ChainId:');
+    const chainIdMsg = await bot.once('message');
+    chainId = chainIdMsg.text;
+
+    // Prompt the user to type the From Token
+    bot.sendMessage(chatId, 'Type To From Token:');
+    const fromTokenMsg = await bot.once('message');
+    fromtoken = fromTokenMsg.text;
+
+    // Prompt the user to type the To Token
+    bot.sendMessage(chatId, 'Type To To Token:');
+    const toTokenMsg = await bot.once('message');
+    totoken = toTokenMsg.text;
+
+    // Prompt the user to enter the amount
+    bot.sendMessage(chatId, 'Amount in:');
+    const amountInMsg = await bot.once('message');
+    amountIn = amountInMsg.text;
+
+    // Perform the swap operation
+    const swaptoken = await controller.mainswap(fromtoken, totoken, amountIn, chainId, chatId);
+    bot.sendMessage(chatId, `Transaction hash: ${swaptoken}`);
+  } catch (error) {
+    console.error("Error handling swap:", error);
+    bot.sendMessage(chatId, "An error occurred while performing the swap.");
+  }
+}
 
 module.exports = {
   telegram

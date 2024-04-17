@@ -17,7 +17,7 @@ const signUp = async (req, res) => {
     console.log("=============================== Sign Up =============================", req.body);
     try {
         const { name, email, password, confirmPassword, chatId } = req.body
-        console.log("🚀 ~ signUp ~ req.body:", req.body.userId)
+        console.log("🚀 ~ signUp ~ req.body:", req.body.chatId)
         if (!name || !email || !password || !confirmPassword) return res.status(HTTP.SUCCESS).send({ status: false, "code": HTTP.NOT_ALLOWED, "message": "All Fields Are Required" })
         if (!email.includes("@")) return res.status(HTTP.SUCCESS).send({ "status": false, 'code': HTTP.BAD_REQUEST, "message": "Email is invalid !", data: {} })
         const random_Number = randomstring.generate({ length: 4, charset: 'numeric' })
@@ -53,38 +53,80 @@ const signUp = async (req, res) => {
     }
 }
 
+// const login = async (req, res) => {
+//     console.log("===================== Login =================")
+//     try {
+//         const { email, password } = req.body;
+//         console.log(req.body)
+//         if (!email || !password) return res.status(HTTP.SUCCESS).send({ status: false, "code": HTTP.NOT_ALLOWED, "msg": "All Fields Are Requried", data: {} })
+//         if (!email.includes("@")) return res.status(HTTP.SUCCESS).send({ "status": false, 'code': HTTP.BAD_REQUEST, "msg": "Email is invalid !", data: {} })
+//         const findUser = await userModel.findOne({ email: email })
+//         if (!findUser) {
+//             return res.status(HTTP.SUCCESS).send({ "status": false, 'code': HTTP.UNAUTHORIZED, "msg": "Email Is Not Existing" })
+//         }
+//         if (findUser.verify == false) {
+//             return res.status(HTTP.SUCCESS).send({ "status": false, 'code': HTTP.UNAUTHORIZED, "msg": "You Are Not Verified" })
+//         }
+//         if (findUser.verify === true) {
+//             bcrypt.compare(password, findUser.password, async (err, result) => {
+//                 if (result === true) {
+//                     const token = jwt.sign({ _id: findUser._id }, process.env.SECRET_KEY)
+//                     findUser.token = token;
+//                     await findUser.save();
+//                     return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, msg: "Login Successfully", token: token })
+//                 } else {
+//                     return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, msg: "Please Valid Password" })
+//                 }
+//             })
+//         } else {
+//             return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, msg: "Please Verify Your Email" })
+//         }
+//     } catch (error) {
+//         return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.INTERNAL_SERVER_ERROR, msg: "Something Went Wrong", error: error.msg })
+//     }
+// }
+
+
+
 const login = async (req, res) => {
     console.log("===================== Login =================")
     try {
-        const { email, password } = req.body;
-        console.log(req.body)
-        if (!email || !password) return res.status(HTTP.SUCCESS).send({ status: false, "code": HTTP.NOT_ALLOWED, "msg": "All Fields Are Requried", data: {} })
-        if (!email.includes("@")) return res.status(HTTP.SUCCESS).send({ "status": false, 'code': HTTP.BAD_REQUEST, "msg": "Email is invalid !", data: {} })
-        const findUser = await userModel.findOne({ email: email })
+        const { email, password, chatId } = req.body;
+        console.log("Request Body:", req.body);
+        if (!email || !password) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.NOT_ALLOWED, msg: "All Fields Are Required", data: {} });
+        if (!email.includes("@")) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, msg: "Email is invalid!", data: {} });
+        
+        const findUser = await userModel.findOne({ email: email });
+        console.log("Find User:", findUser);
         if (!findUser) {
-            return res.status(HTTP.SUCCESS).send({ "status": false, 'code': HTTP.UNAUTHORIZED, "msg": "Email Is Not Existing" })
+            return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.UNAUTHORIZED, msg: "Email Does Not Exist" });
         }
-        if (findUser.verify == false) {
-            return res.status(HTTP.SUCCESS).send({ "status": false, 'code': HTTP.UNAUTHORIZED, "msg": "You Are Not Verified" })
+        if (!findUser.verify) {
+            return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.UNAUTHORIZED, msg: "Account Not Verified" });
         }
-        if (findUser.verify === true) {
-            bcrypt.compare(password, findUser.password, async (err, result) => {
-                if (result === true) {
-                    const token = jwt.sign({ _id: findUser._id }, process.env.SECRET_KEY)
-                    findUser.token = token;
+        bcrypt.compare(password, findUser.password, async (err, result) => {
+            if (result === true) {
+                const token = jwt.sign({ _id: findUser._id }, process.env.SECRET_KEY);
+                const updatedChatId = chatId || null;
+                console.log("Updated ChatId:", updatedChatId);
+                if (!findUser.chatId) {
+                    findUser.chatId = updatedChatId;
                     await findUser.save();
-                    return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, msg: "Login Successfully", token: token })
-                } else {
-                    return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, msg: "Please Valid Password" })
                 }
-            })
-        } else {
-            return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, msg: "Please Verify Your Email" })
-        }
+                return res.status(HTTP.SUCCESS).send({ status: true, code: HTTP.SUCCESS, msg: "Login Successfully", token: token });
+            } else {
+                return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, msg: "Invalid Password" });
+            }
+        });
     } catch (error) {
-        return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.INTERNAL_SERVER_ERROR, msg: "Something Went Wrong", error: error.msg })
+        return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.INTERNAL_SERVER_ERROR, msg: "Something Went Wrong", error: error.msg });
     }
-}
+};
+
+
+
+
+
 
 const verify = async (req, res) => {
     console.log("===================== Verify =================", req.body)

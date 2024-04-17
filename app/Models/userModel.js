@@ -48,7 +48,7 @@ const userSchema = new mongoose.Schema({
     },
     chatId: {
         type: Number,
-        required: true,
+        //required: true,
         // default : "123",
         // unique: true
       },
