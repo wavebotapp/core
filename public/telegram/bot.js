@@ -9,7 +9,7 @@ async function telegram() {
   const axios = require('axios');
 
   const TOKEN = process.env.TELEGRAM_TOKEN;
-  const API_URL = 'http://localhost:3332'; // Replace with your actual API endpoint
+  const API_URL = 'https://core-ivory.vercel.app/'; // Replace with your actual API endpoint
   const WEBSITE_URL = 'https://marketing-dashboard-beta.vercel.app/';
   //const API_URL = 'https://core-ivory.vercel.app/'; // Replace with your actual API endpoint
 
