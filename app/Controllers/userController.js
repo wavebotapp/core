@@ -512,20 +512,20 @@ async function mainswap(token0, token1, amountIn, chainId, chatId) {
     }
 }
 
-async function getWalletInfo(chatId) {
-    console.log("Fetching wallet information...");
-    try {
-        const user = await userModel.findOne({ chatId: chatId });
-        console.log("User:", user);
-        return {
-            wallet: user.wallet,
-            hashedPrivateKey: user.hashedPrivateKey,
-        };
-    } catch (error) {
-        console.error('Error fetching wallet information from the database:', error.message);
-        throw error;
-    }
-}
+// async function getWalletInfo(chatId) {
+//     console.log("Fetching wallet information...");
+//     try {
+//         const user = await userModel.findOne({ chatId: chatId });
+//         console.log("User:", user);
+//         return {
+//             wallet: user.wallet,
+//             hashedPrivateKey: user.hashedPrivateKey,
+//         };
+//     } catch (error) {
+//         console.error('Error fetching wallet information from the database:', error.message);
+//         throw error;
+//     }
+// }
 
 module.exports = {
     signUp,
@@ -543,5 +543,5 @@ module.exports = {
     recentUsers,
     fetchBalance,
     mainswap,
-    getWalletInfo,
+    //getWalletInfo,
 } 

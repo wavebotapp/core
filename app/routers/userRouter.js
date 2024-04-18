@@ -26,7 +26,6 @@ route.post('/balance', authuser  ,coinController.addbalance);
 route.post('/buyCoin', authuser ,  coinController.buy);
 route.post('/sellCoin', authuser ,  coinController.sell);
 route.get('/viewbalance', authuser ,  coinController.viewBalance);
-route.get('/getWalletInfo', userController.getWalletInfo);
 
 route.post('/swapToken',SwapToken.swapToken);
 

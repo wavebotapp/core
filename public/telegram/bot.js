@@ -2,6 +2,7 @@ const userModel = require("../../app/Models/userModel");
 
 async function telegram() {
   const controller = require("../../app/Controllers/userController")
+  const helpers = require("../../helpers")
   const UserModel = require('../../app/Models/userModel')
   const TelegramBot = require('node-telegram-bot-api');
   require('dotenv').config();
@@ -504,33 +505,64 @@ async function telegram() {
         bot.sendMessage(chatId, `Click Custom ✏️ to sell with custom token address.`, { reply_markup: JSON.stringify(UserdataKeyboard) });
         break;
       case 'SwaptokenButton':
-        let fromtoken
+      //   let fromtoken
+      //   let totoken
+      //   let amountIn
+      //   let chainId
+      //   bot.sendMessage(chatId, 'ChainId:');
+      //   bot.once('message', async (chainId) => {
+      //     chainId = chainId.text;
+      //     console.log("🚀 ~ bot.once ~ chainId:", chainId)
+      //   bot.sendMessage(chatId, 'from Token:');
+      //   bot.once('message', async (fromToken) => {
+      //     fromtoken = fromToken.text;
+      //     bot.sendMessage(chatId, 'To Token:');
+      //     bot.once('message', async (totoken) => {
+      //       totoken = totoken.text;
+      //       bot.sendMessage(chatId, 'amount in:');
+      //       bot.once('message', async (amountIn) => {
+      //         // console.log("🚀 ~ bot.once ~ amountIn:", amountIn)
+      //         amountIn = amountIn.text;
+      //         const walletInfo = helpers.getWalletInfo(chatId);
+      //         console.log("🚀 ~ bot.once ~ walletInfo:", walletInfo)
+      //         const swaptoken = await controller.mainswap(fromtoken, totoken, amountIn ,chainId, chatId)
+      //         console.log("🚀 ~ bot.once ~ swaptoken:", swaptoken)
+      //         bot.sendMessage(chatId,`transection hash : ${swaptoken}`);
+      //         // bot.sendMessage(chatId,`transection successfully`);
+      //       })
+      //     })
+      //   })
+      // })
+        
+      
+      let fromtoken
         let totoken
         let amountIn
         let chainId
-        bot.sendMessage(chatId, 'Select ChainId:', { reply_markup: JSON.stringify(blockchainKeyboard) });
-        bot.once('message', async (chainId) => {
-          chainId = chainId.text;
+        bot.sendMessage(chatId, 'Choose a blockchain', { reply_markup: JSON.stringify(blockchainKeyboard) });
+        bot.on('callback_query', async (callbackQuery) => {
+          const data = callbackQuery.data;
+          console.log("🚀 ~ bot.on ~ data:::::::::::>>>>>>>>>>>>>>>", data)
+          chainId = data;
           console.log("🚀 ~ bot.once ~ chainId:", chainId)
-          bot.sendMessage(chatId, 'Type To From Token:');
-          bot.once('message', async (fromToken) => {
-            fromtoken = fromToken.text;
-            bot.sendMessage(chatId, 'Type To To Token:');
-            bot.once('message', async (totoken) => {
-              totoken = totoken.text;
-              bot.sendMessage(chatId, 'amount in:');
-              bot.once('message', async (amountIn) => {
-                // console.log("🚀 ~ bot.once ~ amountIn:", amountIn)
-                amountIn = amountIn.text;
-                const walletInfo = controller.getWalletInfo(chatId);
-                console.log("🚀 ~ bot.once ~ walletInfo:", walletInfo)
-                const swaptoken = await controller.mainswap(fromtoken, totoken, amountIn, chainId, chatId)
-                console.log("🚀 ~ bot.once ~ swaptoken:", swaptoken)
-                bot.sendMessage(chatId, `transection hash : ${swaptoken}`);
-                // bot.sendMessage(chatId,`transection successfully`);
+            bot.sendMessage(chatId, 'Type To From Token:');
+            bot.once('message', async (fromToken) => {
+              fromtoken = fromToken.text;
+              bot.sendMessage(chatId, 'Type To To Token:');
+              bot.once('message', async (totoken) => {
+                totoken = totoken.text;
+                bot.sendMessage(chatId, 'amount in:');
+                bot.once('message', async (amountIn) => {
+                  // console.log("🚀 ~ bot.once ~ amountIn:", amountIn)
+                  amountIn = amountIn.text;
+                  const walletInfo = helpers.getWalletInfo(chatId);
+                  const swaptoken = await controller.mainswap(fromtoken, totoken, amountIn, chainId, chatId)
+                  console.log("🚀 ~ bot.once ~ swaptoken:", swaptoken)
+                  bot.sendMessage(chatId, `transection hash : ${swaptoken}`);
+                  // bot.sendMessage(chatId,`transection successfully`);
+                })
               })
             })
-          })
         })
 
         break;
