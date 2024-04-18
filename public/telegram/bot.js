@@ -1,5 +1,4 @@
 const userModel = require("../../app/Models/userModel");
-
 async function telegram() {
   const controller = require("../../app/Controllers/userController")
   const helpers = require("../../helpers")
@@ -9,9 +8,9 @@ async function telegram() {
   const axios = require('axios');
 
   const TOKEN = process.env.TELEGRAM_TOKEN;
-  const API_URL = 'https://core-ivory.vercel.app/'; // Replace with your actual API endpoint
+  //const API_URL = 'http://localhost:3332'; // Replace with your actual API endpoint
   const WEBSITE_URL = 'https://marketing-dashboard-beta.vercel.app/';
-  //const API_URL = 'https://core-ivory.vercel.app/'; // Replace with your actual API endpoint
+  const API_URL = 'https://core-ivory.vercel.app/'; // Replace with your actual API endpoint
 
   const bot = new TelegramBot(TOKEN, { polling: true });
 
@@ -621,6 +620,7 @@ async function handleSwap(chatId, controller) {
     // Perform the swap operation
     const swaptoken = await controller.mainswap(fromtoken, totoken, amountIn, chainId, chatId);
     bot.sendMessage(chatId, `Transaction hash: ${swaptoken}`);
+
   } catch (error) {
     console.error("Error handling swap:", error);
     bot.sendMessage(chatId, "An error occurred while performing the swap.");
