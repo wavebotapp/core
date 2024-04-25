@@ -29,5 +29,7 @@ route.get('/viewbalance', authuser ,  coinController.viewBalance);
 
 route.post('/swapToken',SwapToken.swapToken);
 
+route.post('/mainswap',userController.mainswap);
+
 
 module.exports = route

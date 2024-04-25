@@ -95,7 +95,7 @@ const login = async (req, res) => {
         console.log("Request Body:", req.body);
         if (!email || !password) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.NOT_ALLOWED, msg: "All Fields Are Required", data: {} });
         if (!email.includes("@")) return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.BAD_REQUEST, msg: "Email is invalid!", data: {} });
-        
+
         const findUser = await userModel.findOne({ email: email });
         console.log("Find User:", findUser);
         if (!findUser) {
@@ -122,11 +122,6 @@ const login = async (req, res) => {
         return res.status(HTTP.SUCCESS).send({ status: false, code: HTTP.INTERNAL_SERVER_ERROR, msg: "Something Went Wrong", error: error.msg });
     }
 };
-
-
-
-
-
 
 const verify = async (req, res) => {
     console.log("===================== Verify =================", req.body)
@@ -493,39 +488,44 @@ async function fetchBalance(wallet) {
 }
 
 
-async function mainswap(token0, token1, amountIn, chainId, chatId) {
+// async function mainswap(token0, token1, amountIn, chainId, chatId) {
+//     try {
+//         console.log('token0', token0, 'token1', token1, amountIn)
+//         const poolAddress = await pooladress(token0, token1 ,chainId)
+//         console.log("🚀 ~ SwapToken ~ poolAddress:", poolAddress)
+//         //   const getPoolImmutables = await getPoolImmutables(poolContract)
+//         //   const getPoolState = await getPoolState(poolContract)
+//         if (poolAddress) {
+//             const executeSwap = await swapToken(token0, token1, poolAddress[0], amountIn ,chainId, chatId)
+//             //console.log("-------------------------> mainswap", executeSwap.msg)
+//             return executeSwap
+//         }
+//     } catch (error) {
+//         console.log(error)
+//         return error.reason
+
+//     }
+// }
+
+
+const mainswap = async (req, res) => {
+    let { token0, token1, amountIn, chainId, chatId } = req.body;
+    amountIn = Number(amountIn)
+    chainId = Number(chainId)
     try {
-        console.log('token0', token0, 'token1', token1, amountIn)
-        const poolAddress = await pooladress(token0, token1 ,chainId)
-        console.log("🚀 ~ SwapToken ~ poolAddress:", poolAddress)
-        //   const getPoolImmutables = await getPoolImmutables(poolContract)
-        //   const getPoolState = await getPoolState(poolContract)
+        const poolAddress = await pooladress(token0, token1, chainId)
         if (poolAddress) {
-            const executeSwap = await swapToken(token0, token1, poolAddress[0], amountIn ,chainId, chatId)
+            const executeSwap = await swapToken(token0, token1, poolAddress[0], amountIn, chainId, chatId)
             //console.log("-------------------------> mainswap", executeSwap.msg)
             return executeSwap
         }
+        return res.status(HTTP.SUCCESS).send({ 'status': false, 'code': HTTP.SUCCESS, 'msg': 'success', data: result });
     } catch (error) {
-        console.log(error)
-        return error.reason
-
+        console.log("🚀 ~  ~ error:", error);
+        return res.status(HTTP.INTERNAL_SERVER_ERROR).send({ 'status': false, 'code': HTTP.INTERNAL_SERVER_ERROR, 'msg': 'Something went wrong!', data: {} });
     }
-}
+};
 
-// async function getWalletInfo(chatId) {
-//     console.log("Fetching wallet information...");
-//     try {
-//         const user = await userModel.findOne({ chatId: chatId });
-//         console.log("User:", user);
-//         return {
-//             wallet: user.wallet,
-//             hashedPrivateKey: user.hashedPrivateKey,
-//         };
-//     } catch (error) {
-//         console.error('Error fetching wallet information from the database:', error.message);
-//         throw error;
-//     }
-// }
 
 module.exports = {
     signUp,

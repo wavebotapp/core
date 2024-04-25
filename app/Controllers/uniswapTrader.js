@@ -114,9 +114,12 @@ require('dotenv').config();
 const swapRouterAddress = '0xE592427A0AEce92De3Edee1F18E0157C05861564';
 
 async function swapToken(token0, token1, poolAddress, amountIn, chainId, chatId) {
+    console.log("🚀 ~ swapToken ~ chainId:", chainId)
+    console.log("🚀 ~ swapToken ~ amountIn:", amountIn)
     // console.log("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy", chainId)
     console.log("-------------------------------------swap------------------------WWWW");
     const walletInfo = await getWalletInfo(chatId);
+    //console.log("🚀 ~ swapToken ~ walletInfo:", walletInfo)
     const WALLET_ADDRESS = walletInfo.wallet;
     // console.log("🚀 ~ swapToken ~ WALLET_ADDRESS:", WALLET_ADDRESS);
     const WALLET_SECRET = walletInfo.hashedPrivateKey;
@@ -209,7 +212,6 @@ async function swapToken(token0, token1, poolAddress, amountIn, chainId, chatId)
 module.exports = {
     swapToken
 };
-
 
 
 // const { ethers } = require('ethers')
